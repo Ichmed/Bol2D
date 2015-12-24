@@ -1,5 +1,7 @@
 package com.ichmed.bol2d.entity.pickup;
 
+import java.util.List;
+
 import org.lwjgl.util.vector.Vector2f;
 
 import com.ichmed.bol2d.Game;
@@ -17,12 +19,18 @@ public abstract class EntityPickup extends Entity
 	@Override
 	public void onUpdate()
 	{
-		for (Entity e : Game.getGameWorld().getOverlappingEntities(this))
-			if (canPickUp(e))
-			{
-				pickUp(e);
-				this.kill();
-			}
+		if (this.actionCooldown <= 0)
+		{
+			List<Entity> l = Game.getGameWorld().getOverlappingEntities(this);
+			for (Entity e : l)
+				if (canPickUp(e))
+				{
+					pickUp(e);
+					this.kill();
+				}
+			this.actionCooldown = 3;
+		}
+
 		super.onUpdate();
 	}
 

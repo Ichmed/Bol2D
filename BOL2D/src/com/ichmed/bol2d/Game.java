@@ -32,10 +32,8 @@ public abstract class Game
 	private static HashMap<Integer, Boolean> isButtonDown = new HashMap<Integer, Boolean>();
 	private static HashMap<Integer, Boolean> wasButtonDown = new HashMap<Integer, Boolean>();
 
-	
 	private static int fps;
-	
-	
+
 	public static int getFps()
 	{
 		return fps;
@@ -45,6 +43,7 @@ public abstract class Game
 
 	static final int TICKS_PER_SECOND = 60;
 	private static int ticksThisSecond;
+
 	public static int getTicksThisSecond()
 	{
 		return ticksThisSecond;
@@ -269,6 +268,10 @@ public abstract class Game
 			}
 		}
 
+		for (Entity e : gameWorld.getCurrentEntities())
+		{
+			System.out.println(e);
+		}
 		TextureLibrary.cleanUp();
 	}
 

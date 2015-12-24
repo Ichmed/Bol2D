@@ -2,6 +2,8 @@ package com.ichmed.bol2d.entity;
 
 import org.lwjgl.util.vector.Vector2f;
 
+import com.ichmed.bol2d.entity.ai.behaviour.BehaviourRemoveOnCleanup;
+
 public class EntityGenericParticle extends Entity
 {
 
@@ -12,6 +14,7 @@ public class EntityGenericParticle extends Entity
 		this.spawnDebrisOnDeath = false;
 		this.rotateToMovement = false;
 		this.type = EntityType.PARTICLE;
+		this.addBehaviour(new BehaviourRemoveOnCleanup());
 	}
 	
 	@Override
