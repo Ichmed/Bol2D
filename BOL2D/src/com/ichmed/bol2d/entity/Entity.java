@@ -36,8 +36,6 @@ public abstract class Entity
 	public boolean spawnDebrisOnDeath = true;
 	public boolean isInmoveable = false;
 
-	protected EntityType type;
-
 	private HashMap<String, Float> stats = new HashMap<String, Float>();
 
 	public Entity target = null;
@@ -209,10 +207,7 @@ public abstract class Entity
 		return ticksExisted;
 	}
 
-	public EntityType getType()
-	{
-		return type;
-	}
+	public abstract EntityType getType();
 
 	public Vector2f getVelocity()
 	{
@@ -308,7 +303,7 @@ public abstract class Entity
 			this.desiredRotation = MathUtil.getRotationForDirection(this.velocity) % 360;
 		}
 		if (this.desiredRotation >= 0) this.rotation = this.desiredRotation;
-		List<Entity> l = Game.getGameWorld().getOverlappingEntities(this, true);
+		List<Entity> l = Game.getGameWorld().getOverlappingEntities(this, true, EntityType.NO_PARTICLES);
 		for (int i = 0; i < behaviours.length; i++)
 			for (Behaviour b : this.behaviours[i])
 			{

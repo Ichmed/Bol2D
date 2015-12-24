@@ -16,6 +16,8 @@ public abstract class World
 {
 	private List<Entity> currentEntities = new ArrayList<Entity>();
 	private List<Entity> nextEntities = new ArrayList<Entity>();
+	private Map<EntityType, List<Entity>> currentEntitiesByType = new HashMap<EntityType, List<Entity>>();
+	private Map<EntityType, List<Entity>> nextEntitiesByType = new HashMap<EntityType, List<Entity>>();
 	public EntityPlayer player;
 	private float RENDER_RANGE = 1200;
 	private int renderRangeLastTick = 0;
@@ -26,6 +28,13 @@ public abstract class World
 	private List<Entity> entitiesToCleanup = new ArrayList<Entity>();
 	private List<Entity> entitiesInUpdateRange = null;
 
+	
+	public World()
+	{
+		for(EntityType t : EntityType.ALL)
+			nextEntitiesByType.put(t, new ArrayList<Entity>());
+	}
+	
 	public void updateAllEntities()
 	{
 		this.nextEntities = new ArrayList<Entity>(this.currentEntities);
@@ -82,6 +91,7 @@ public abstract class World
 		// if(Game.getTicksTotal() < 1) t =
 		// Texture.makeTexture("resc/texture/player1.png", "png");
 		glColor3f(1, 1, 1);
+		this.currentEntitiesByType = new HashMap<EntityType, List<Entity>>(this.nextEntitiesByType);
 		updateAllEntities();
 		drawAllEntities();
 		drawHud();
@@ -97,6 +107,8 @@ public abstract class World
 			if (currentParticles >= Game.getCurrentGame().getParticleMax()) return;
 			currentParticles++;
 		}
+		System.out.println(e.getType());
+		this.nextEntitiesByType.get(e.getType()).add(e);
 		this.nextEntities.add(e);
 		e.onSpawn();
 	}
@@ -104,33 +116,32 @@ public abstract class World
 	public void removeEntity(Entity e)
 	{
 		if (this.nextEntities.remove(e)) if (e.getType() == EntityType.PARTICLE) currentParticles--;
+		this.nextEntitiesByType.get(e.getType()).remove(e);
 	}
 
-	public List<Entity> getOverlappingEntities(Entity e)
+	public List<Entity> getOverlappingEntities(Entity e, EntityType[] types)
 	{
-		return getOverlappingEntities(e, true);
+		return getOverlappingEntities(e, true, types);
 	}
 
-	public List<Entity> getOverlappingEntities(Entity e, boolean solidsOnly)
-	{
-		return getOverlappingEntities(e, currentEntities, solidsOnly);
-	}
-
-	public List<Entity> getOverlappingEntities(Entity e, List<Entity> l, boolean solidsOnly)
+	public List<Entity> getOverlappingEntities(Entity e, boolean solidsOnly, EntityType[] types)
 	{
 		List<Entity> ret = new ArrayList<Entity>();
-		l = sortListByDistance(e, l, e.getSize().x + e.getSize().y);
-		for (Entity d : l)
-		{
-			if (e == d) continue;
-			if (solidsOnly && !d.isSolid) continue;
-			Vector2f v = e.getPosition();
-			if (MathUtil.isPointInArea(new Vector2f(v.x, v.y), d.getPosition(), d.getSize()) || MathUtil.isPointInArea(new Vector2f(v.x + e.getSize().x, v.y), d.getPosition(), d.getSize())
-					|| MathUtil.isPointInArea(new Vector2f(v.x + e.getSize().x, v.y + e.getSize().y), d.getPosition(), d.getSize())
-					|| MathUtil.isPointInArea(new Vector2f(v.x, v.y + e.getSize().y), d.getPosition(), d.getSize())) ret.add(d);
-		}
 
-		return ret;
+		for (EntityType t : types)
+		{
+			List<Entity> l = currentEntitiesByType.get(t);
+			for (Entity d : l)
+			{
+				if (e == d) continue;
+				if (solidsOnly && !d.isSolid) continue;
+				Vector2f v = e.getPosition();
+				if (MathUtil.isPointInArea(new Vector2f(v.x, v.y), d.getPosition(), d.getSize()) || MathUtil.isPointInArea(new Vector2f(v.x + e.getSize().x, v.y), d.getPosition(), d.getSize())
+						|| MathUtil.isPointInArea(new Vector2f(v.x + e.getSize().x, v.y + e.getSize().y), d.getPosition(), d.getSize())
+						|| MathUtil.isPointInArea(new Vector2f(v.x, v.y + e.getSize().y), d.getPosition(), d.getSize())) ret.add(d);
+			}
+		}
+		return sortListByDistance(e, ret);
 	}
 
 	public List<Entity> sortListByDistance(Entity center, List<Entity> list)

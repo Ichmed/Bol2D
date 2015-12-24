@@ -21,7 +21,7 @@ public abstract class EntityPickup extends Entity
 	{
 		if (this.actionCooldown <= 0)
 		{
-			List<Entity> l = Game.getGameWorld().getOverlappingEntities(this);
+			List<Entity> l = Game.getGameWorld().getOverlappingEntities(this, EntityType.CHARCTERS_ONLY);
 			for (Entity e : l)
 				if (canPickUp(e))
 				{
@@ -35,6 +35,14 @@ public abstract class EntityPickup extends Entity
 	}
 
 	public abstract void pickUp(Entity e);
+	
+	
+
+	@Override
+	public EntityType getType()
+	{
+		return EntityType.PICKUP;
+	}
 
 	public boolean canPickUp(Entity e)
 	{

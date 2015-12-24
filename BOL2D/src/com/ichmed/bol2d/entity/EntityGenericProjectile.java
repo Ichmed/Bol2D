@@ -1,6 +1,6 @@
 package com.ichmed.bol2d.entity;
 
-import org.lwjgl.util.vector.*;
+import org.lwjgl.util.vector.Vector2f;
 
 import com.ichmed.bol2d.entity.ai.behaviour.BehaviourRemoveOnCleanup;
 
@@ -20,5 +20,11 @@ public class EntityGenericProjectile extends Entity
 	public Vector2f getInitialSize()
 	{
 		return new Vector2f(40, 40);
+	}
+
+	@Override
+	public EntityType getType()
+	{
+		return EntityType.PROJECTILE;
 	}
 }

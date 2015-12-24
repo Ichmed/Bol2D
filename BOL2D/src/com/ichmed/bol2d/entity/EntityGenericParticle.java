@@ -13,7 +13,6 @@ public class EntityGenericParticle extends Entity
 		this.isSolid = false;
 		this.spawnDebrisOnDeath = false;
 		this.rotateToMovement = false;
-		this.type = EntityType.PARTICLE;
 		this.addBehaviour(new BehaviourRemoveOnCleanup());
 	}
 	
@@ -27,5 +26,11 @@ public class EntityGenericParticle extends Entity
 	public void performCleanup()
 	{
 		this.kill();
+	}
+
+	@Override
+	public EntityType getType()
+	{
+		return EntityType.PARTICLE;
 	}
 }
