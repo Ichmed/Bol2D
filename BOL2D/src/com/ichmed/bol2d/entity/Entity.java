@@ -7,8 +7,8 @@ import org.lwjgl.util.vector.*;
 import com.ichmed.bol2d.Game;
 import com.ichmed.bol2d.entity.ai.behaviour.*;
 import com.ichmed.bol2d.entity.damage.*;
+import com.ichmed.bol2d.render.RenderUtil;
 import com.ichmed.bol2d.util.MathUtil;
-import com.ichmed.bol2d.util.render.RenderUtil;
 
 public abstract class Entity
 {

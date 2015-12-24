@@ -13,7 +13,7 @@ import org.lwjgl.opengl.GL;
 import org.lwjgl.util.vector.Vector2f;
 
 import com.ichmed.bol2d.entity.Entity;
-import com.ichmed.bol2d.util.render.TextureLibrary;
+import com.ichmed.bol2d.render.TextureLibrary;
 import com.ichmed.bol2d.world.World;
 
 public abstract class Game

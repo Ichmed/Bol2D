@@ -9,8 +9,8 @@ import org.lwjgl.util.vector.Vector2f;
 import com.ichmed.bol2d.Game;
 import com.ichmed.bol2d.entity.*;
 import com.ichmed.bol2d.entity.player.EntityPlayer;
+import com.ichmed.bol2d.render.RenderUtil;
 import com.ichmed.bol2d.util.MathUtil;
-import com.ichmed.bol2d.util.render.RenderUtil;
 
 public abstract class World
 {
@@ -37,13 +37,12 @@ public abstract class World
 	
 	public void updateAllEntities()
 	{
-		this.nextEntities = new ArrayList<Entity>(this.currentEntities);
+		this.currentEntities = new ArrayList<Entity>(this.nextEntities);
 		for (Entity e : getEntitesInUpdateRange())
 			e.onUpdate();
 
 		for (Entity e : entitiesToCleanup)
 			e.performCleanup();
-		this.currentEntities = nextEntities;
 	}
 
 	public void drawAllEntities()
@@ -107,7 +106,6 @@ public abstract class World
 			if (currentParticles >= Game.getCurrentGame().getParticleMax()) return;
 			currentParticles++;
 		}
-		System.out.println(e.getType());
 		this.nextEntitiesByType.get(e.getType()).add(e);
 		this.nextEntities.add(e);
 		e.onSpawn();

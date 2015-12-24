@@ -19,24 +19,17 @@ public abstract class EntityPickup extends Entity
 	@Override
 	public void onUpdate()
 	{
-		if (this.actionCooldown <= 0)
-		{
-			List<Entity> l = Game.getGameWorld().getOverlappingEntities(this, EntityType.CHARCTERS_ONLY);
-			for (Entity e : l)
-				if (canPickUp(e))
-				{
-					pickUp(e);
-					this.kill();
-				}
-			this.actionCooldown = 3;
-		}
-
+		List<Entity> l = Game.getGameWorld().getOverlappingEntities(this, EntityType.CHARCTERS_ONLY);
+		for (Entity e : l)
+			if (canPickUp(e))
+			{
+				pickUp(e);
+				this.kill();
+			}
 		super.onUpdate();
 	}
 
 	public abstract void pickUp(Entity e);
-	
-	
 
 	@Override
 	public EntityType getType()
@@ -44,10 +37,5 @@ public abstract class EntityPickup extends Entity
 		return EntityType.PICKUP;
 	}
 
-	public boolean canPickUp(Entity e)
-	{
-		if (e.getType() == EntityType.PARTICLE || e.getType() == EntityType.PICKUP) return false;
-		return true;
-
-	}
+	public abstract boolean canPickUp(Entity e);
 }
