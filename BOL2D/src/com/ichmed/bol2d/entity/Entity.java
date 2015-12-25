@@ -7,7 +7,7 @@ import org.lwjgl.util.vector.*;
 import com.ichmed.bol2d.Game;
 import com.ichmed.bol2d.entity.ai.behaviour.*;
 import com.ichmed.bol2d.entity.damage.*;
-import com.ichmed.bol2d.render.RenderUtil;
+import com.ichmed.bol2d.render.*;
 import com.ichmed.bol2d.util.MathUtil;
 
 public abstract class Entity
@@ -24,7 +24,7 @@ public abstract class Entity
 	public Vector3f color = new Vector3f(1, 1, 1);
 	public EntityType enemy = EntityType.PLAYER;
 	public String textureName = "player1";
-	
+
 	public int actionCooldown;
 
 	protected double desiredRotation = 0;
@@ -47,9 +47,10 @@ public abstract class Entity
 
 	@SuppressWarnings("unchecked")
 	public List<Behaviour>[] behaviours = new ArrayList[10];
+	@SuppressWarnings("unchecked")
+	public List<RenderContainerEntity>[] renderContainers = new List[10];
 
 	protected List<List<Behaviour>> projectlieBehaviourSets = new ArrayList<List<Behaviour>>();
-	protected int layer = 3;
 	protected String debrisTexture = "debris1";
 	protected float debrisSize = 0.2f;
 	protected float debrisFactor = 0.2f;
@@ -58,9 +59,26 @@ public abstract class Entity
 	{
 		for (int i = 0; i < behaviours.length; i++)
 			behaviours[i] = new ArrayList<Behaviour>();
+		this.size = this.getInitialSize();
+	}
+
+	public void init()
+	{
+		for (int i = 0; i < renderContainers.length; i++)
+			renderContainers[i] = getRenderContainers(i);
 		initStats();
 		this.healthSystem = getHealthSystem(stats.get("MAX_HEALTH"));
-		this.size = this.getInitialSize();
+	}
+
+	protected List<RenderContainerEntity> getRenderContainers(int layer)
+	{
+		if (layer == 4)
+		{
+			ArrayList<RenderContainerEntity> l = new ArrayList<RenderContainerEntity>();
+			l.add(new RenderContainerEntity(this, true, true, this.textureName, new Vector2f()));
+			return l;
+		}
+		return new ArrayList<RenderContainerEntity>();
 	}
 
 	protected HealthSystem getHealthSystem(Float health)
@@ -165,18 +183,8 @@ public abstract class Entity
 
 	public void draw(int i)
 	{
-		if (i == this.layer)
-		{
-			RenderUtil.pushMatrix();
-			RenderUtil.setColor(this.color);
-			Vector2f v = new Vector2f(this.getCenter());
-			RenderUtil.translate((Vector2f) v.scale(0.001f));
-			RenderUtil.rotateByDegrees((float) this.rotation);
-			RenderUtil.translate(new Vector2f(-this.size.x / 2000f, -this.size.y / 2000f));
-			RenderUtil.drawTexturedRect(0, 0, size.getX() / 1000d, size.getY() / 1000d, this.textureName);
-			RenderUtil.setColor(RenderUtil.WHITE);
-			RenderUtil.popMatrix();
-		}
+		for (RenderContainerEntity r : this.renderContainers[i])
+			r.render();
 	}
 
 	public Vector2f getCenter()

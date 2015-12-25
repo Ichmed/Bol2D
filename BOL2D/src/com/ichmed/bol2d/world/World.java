@@ -49,7 +49,7 @@ public abstract class World
 	{
 		glPushMatrix();
 		RenderUtil.centerViewOnEntity(player);
-		for (int i = 0; i < 5; i++)
+		for (int i = 0; i < 10; i++)
 			for (Entity e : getEntitesInRenderRange())
 			{
 				e.draw(i);
@@ -101,6 +101,7 @@ public abstract class World
 
 	public void spawn(Entity e)
 	{
+		e.init();
 		if (e.getType() == EntityType.PARTICLE)
 		{
 			if (currentParticles >= Game.getCurrentGame().getParticleMax()) return;

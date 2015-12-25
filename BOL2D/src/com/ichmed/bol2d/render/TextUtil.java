@@ -78,8 +78,6 @@ public class TextUtil
 			return "doublequotes";
 		case '\'':
 			return "quote";
-		case '§':
-			return "section";
 		case '$':
 			return "dollar";
 		case '%':
