@@ -16,7 +16,7 @@ public class TextUtil
 			{
 				String name = "letter_" + font + "_" + getNameForChar(c);
 				// pos += getWidthForChar(c);
-				RenderUtil.drawTexturedRect(startX + posX * size, startY + posY, size, size, name);
+				RenderUtil.drawLibraryTextureRect(startX + posX * size, startY + posY, size, size, name);
 				posX += getWidthForChar(c);
 			}
 		}

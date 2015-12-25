@@ -6,14 +6,21 @@ import org.lwjgl.util.vector.Vector2f;
 
 import com.ichmed.bol2d.Game;
 import com.ichmed.bol2d.entity.*;
+import com.ichmed.bol2d.entity.damage.*;
 
 public abstract class EntityPickup extends Entity
 {
-
+	
 	@Override
 	public Vector2f getInitialSize()
 	{
 		return new Vector2f(20, 20);
+	}
+	
+	@Override
+	protected HealthSystem getHealthSystem(Float health)
+	{
+		return new HealthSystemIndestructible();
 	}
 
 	@Override

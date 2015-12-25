@@ -5,14 +5,14 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryUtil.*;
 
 import java.nio.DoubleBuffer;
-import java.util.HashMap;
+import java.util.*;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.util.vector.Vector2f;
 
-import com.ichmed.bol2d.entity.Entity;
+import com.ichmed.bol2d.entity.*;
 import com.ichmed.bol2d.render.TextureLibrary;
 import com.ichmed.bol2d.world.World;
 
@@ -33,6 +33,10 @@ public abstract class Game
 	private static HashMap<Integer, Boolean> wasButtonDown = new HashMap<Integer, Boolean>();
 
 	private static int fps;
+
+	public static boolean consoleOn = false;
+	static List<String> consoleHistory = new ArrayList<String>();
+	public static String consoleIn = "";
 
 	public static int getFps()
 	{
@@ -149,10 +153,26 @@ public abstract class Game
 			@Override
 			public void invoke(long window, int key, int scancode, int action, int mods)
 			{
-				if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE) glfwSetWindowShouldClose(window, GLFW_TRUE);
 				if (action == GLFW_PRESS || action == GLFW_REPEAT) isKeyDown.put(key, true);
 				if (action == GLFW_RELEASE) isKeyDown.put(key, false);
 
+				if (action == GLFW_PRESS || action == GLFW_REPEAT)
+				{
+					if (consoleOn)
+					{
+						if (key == GLFW_KEY_ESCAPE) consoleOn = false;
+						if (key >= 32 && key < 96) consoleIn += (char) key;
+						if (key == GLFW_KEY_BACKSPACE && consoleIn.length() > 1) consoleIn = consoleIn.substring(0, consoleIn.length() - 1);
+						if (key == GLFW_KEY_ENTER)
+						{
+							interpretInput(consoleIn);
+							consoleHistory.add(consoleIn);
+							consoleIn = "";
+							consoleOn = false;
+						}
+					} else if (key == GLFW_KEY_ESCAPE) glfwSetWindowShouldClose(window, GLFW_TRUE);
+					else if (key == GLFW_KEY_ENTER && !consoleOn) consoleOn = true;
+				}
 			}
 		});
 
@@ -179,6 +199,13 @@ public abstract class Game
 
 		// Make the window visible
 		glfwShowWindow(window);
+	}
+
+	public void interpretInput(String consoleIn)
+	{
+		if (consoleIn.equals("EXIT")) glfwSetWindowShouldClose(window, GLFW_TRUE);
+		if (consoleIn.equals("KILL ALL")) for (Entity e : gameWorld.getCurrentEntities())
+			if (e.getType() != EntityType.PLAYER) e.kill();
 	}
 
 	public void run()
@@ -214,6 +241,8 @@ public abstract class Game
 		{
 			e.printStackTrace();
 		}
+
+		gameWorld.init();
 
 		long lastMillis = System.currentTimeMillis();
 		while (glfwWindowShouldClose(window) == GLFW_FALSE)
@@ -266,11 +295,9 @@ public abstract class Game
 				fps = ticksThisSecond;
 				ticksThisSecond = 0;
 			}
-		}
 
-		for (Entity e : gameWorld.getCurrentEntities())
-		{
-			System.out.println(e);
+			this.gameWorld.player.enableInput = !this.consoleOn;
+
 		}
 		TextureLibrary.cleanUp();
 	}

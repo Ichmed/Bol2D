@@ -92,9 +92,19 @@ public abstract class World
 		glColor3f(1, 1, 1);
 		this.currentEntitiesByType = new HashMap<EntityType, List<Entity>>(this.nextEntitiesByType);
 		updateAllEntities();
+		drawBackground();
 		drawAllEntities();
 		drawHud();
 		Game.updateKeyMaps();
+	}
+	
+	public void init()
+	{
+		
+	}
+
+	protected void drawBackground()
+	{
 	}
 
 	public abstract void drawHud();

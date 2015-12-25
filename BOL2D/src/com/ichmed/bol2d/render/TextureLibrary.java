@@ -215,4 +215,9 @@ public class TextureLibrary
 		}
 
 	}
+
+	public static void bind()
+	{
+		textureGL.bind();
+	}
 }

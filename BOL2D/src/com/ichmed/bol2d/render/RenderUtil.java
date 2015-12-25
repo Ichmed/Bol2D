@@ -13,7 +13,7 @@ public class RenderUtil
 	public static final Vector3f RED = new Vector3f(1, 0, 0);
 	public static final Vector3f CYAN = new Vector3f(0, 1, 1);
 
-	public static void drawTexturedRect(double x, double y, double width, double height, String name)
+	public static void drawLibraryTextureRect(double x, double y, double width, double height, String name)
 	{
 		glEnable(GL_TEXTURE_2D);
 		Vector4f v = TextureLibrary.getCoordinates(name);
@@ -31,6 +31,22 @@ public class RenderUtil
 			glVertex2d(x + width, y + height);
 			glTexCoord2f(x1, y1);
 			glVertex2d(x, y + height);
+		}
+		glEnd();
+	}
+
+	public static void drawTexturedRect(Vector4f coords, Vector4f textureCoords)
+	{
+		glBegin(GL_QUADS);
+		{
+			glTexCoord2f(textureCoords.x, textureCoords.y);
+			glVertex2d(coords.x, coords.y);
+			glTexCoord2f(textureCoords.z, textureCoords.y);
+			glVertex2d(coords.z, coords.y);
+			glTexCoord2f(textureCoords.z, textureCoords.w);
+			glVertex2d(coords.z, coords.w);
+			glTexCoord2f(textureCoords.x, textureCoords.w);
+			glVertex2d(coords.x, coords.w);
 		}
 		glEnd();
 	}

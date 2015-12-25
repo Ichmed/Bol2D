@@ -36,7 +36,7 @@ public class RenderContainerEntity
 		RenderUtil.translate((Vector2f) v.scale(0.001f));
 		RenderUtil.rotateByDegrees((float) rot);
 		RenderUtil.translate(new Vector2f(-owner.getSize().getX() / 2000f, -owner.getSize().getY() / 2000f));
-		RenderUtil.drawTexturedRect(0, 0, owner.getSize().getX() / 1000d, owner.getSize().getY() / 1000d, this.textureName);
+		RenderUtil.drawLibraryTextureRect(0, 0, owner.getSize().getX() / 1000d, owner.getSize().getY() / 1000d, this.textureName);
 		RenderUtil.popMatrix();
 	}
 }
