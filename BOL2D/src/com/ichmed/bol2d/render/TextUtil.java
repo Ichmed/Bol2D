@@ -37,6 +37,8 @@ public class TextUtil
 			return 0.3f;
 		case ' ':
 			return 0.3f;
+		case 'W':
+			return 0.8f;
 		default:
 			return 0.6f;
 		}

@@ -12,7 +12,7 @@ import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.util.vector.Vector2f;
 
-import com.ichmed.bol2d.entity.*;
+import com.ichmed.bol2d.entity.Entity;
 import com.ichmed.bol2d.gui.*;
 import com.ichmed.bol2d.render.TextureLibrary;
 import com.ichmed.bol2d.util.*;
@@ -35,6 +35,7 @@ public abstract class Game
 	}
 
 	private static HashMap<Integer, Boolean> isKeyDown = new HashMap<Integer, Boolean>();
+	private static HashMap<Integer, Boolean> isKeyDownOverride = new HashMap<Integer, Boolean>();
 	private static HashMap<Integer, Boolean> wasKeyDown = new HashMap<Integer, Boolean>();
 	private static HashMap<Integer, Boolean> isButtonDown = new HashMap<Integer, Boolean>();
 	private static HashMap<Integer, Boolean> wasButtonDown = new HashMap<Integer, Boolean>();
@@ -121,7 +122,10 @@ public abstract class Game
 	public static boolean isKeyDown(int key)
 	{
 		Boolean b = isKeyDown.get(key);
+		Boolean c = isKeyDownOverride.get(key);		
+		if(c == null || c == false)
 		return b == null ? false : b;
+		return true;
 	}
 
 	public static boolean isButtonDown(int key)
@@ -322,4 +326,9 @@ public abstract class Game
 	public abstract int getMaxTexLibSize();
 
 	public abstract IInputReceiver getDefaultInputReceiver();
+
+	public static void overrideIsKeyDown(Integer key, Boolean value)
+	{
+		isKeyDownOverride.put(key, value);
+	}
 }

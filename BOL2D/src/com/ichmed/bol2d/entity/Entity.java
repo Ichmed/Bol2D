@@ -7,7 +7,7 @@ import org.lwjgl.util.vector.*;
 import com.ichmed.bol2d.Game;
 import com.ichmed.bol2d.entity.ai.behaviour.*;
 import com.ichmed.bol2d.entity.damage.*;
-import com.ichmed.bol2d.render.*;
+import com.ichmed.bol2d.render.RenderContainerEntity;
 import com.ichmed.bol2d.util.MathUtil;
 
 public abstract class Entity
@@ -50,7 +50,6 @@ public abstract class Entity
 	@SuppressWarnings("unchecked")
 	public List<RenderContainerEntity>[] renderContainers = new List[10];
 
-	protected List<List<Behaviour>> projectlieBehaviourSets = new ArrayList<List<Behaviour>>();
 	protected String debrisTexture = "debris1";
 	protected float debrisSize = 0.2f;
 	protected float debrisFactor = 0.2f;
@@ -199,12 +198,6 @@ public abstract class Entity
 		return position;
 	}
 
-	public List<Behaviour> getProjectileBehaviours(int id)
-	{
-		if (this.projectlieBehaviourSets.size() <= id + 1) return this.projectlieBehaviourSets.get(id);
-		return null;
-	}
-
 	public Vector2f getSize()
 	{
 		return size;
@@ -346,5 +339,10 @@ public abstract class Entity
 	public void setSize(Vector2f size)
 	{
 		this.size = new Vector2f(size);
+	}
+
+	public String getName()
+	{
+		return this.toString();
 	}
 }
