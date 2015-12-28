@@ -30,7 +30,9 @@ public class Texture
 			imgData[i + 2] = (byte) (color.getBlue());
 			imgData[i + 3] = (byte) (color.getAlpha());
 		}
-		return new Texture(imgData, bfrdImg.getWidth(), bfrdImg.getHeight());
+		Texture t = new Texture(imgData, bfrdImg.getWidth(), bfrdImg.getHeight());
+		System.out.println("Created Texture " + t.ID);
+		return t;
 	}
 
 	public Texture(byte[] data, int width, int height)

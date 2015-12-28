@@ -4,7 +4,7 @@ import org.lwjgl.util.vector.*;
 
 import com.ichmed.bol2d.entity.Entity;
 
-public class RenderContainerEntity
+public class RenderContainerEntity implements IRenderContainer
 {
 	Entity owner;
 	boolean useEntityRotation;

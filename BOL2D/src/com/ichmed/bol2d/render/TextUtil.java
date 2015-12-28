@@ -11,7 +11,7 @@ public class TextUtil
 			if (c == '\n')
 			{
 				posX = 0;
-				posY -= size * 1.3f;
+				posY -= size;
 			} else
 			{
 				String name = "letter_" + font + "_" + getNameForChar(c);
@@ -36,9 +36,9 @@ public class TextUtil
 		case 'j':
 			return 0.3f;
 		case ' ':
-			return 0.2f;
+			return 0.3f;
 		default:
-			return 0.5f;
+			return 0.6f;
 		}
 	}
 

@@ -12,6 +12,7 @@ public class RenderUtil
 	public static final Vector3f WHITE = new Vector3f(1, 1, 1);
 	public static final Vector3f RED = new Vector3f(1, 0, 0);
 	public static final Vector3f CYAN = new Vector3f(0, 1, 1);
+	public static final Vector3f BLACK = new Vector3f(0, 0, 0);
 
 	public static void drawLibraryTextureRect(double x, double y, double width, double height, String name)
 	{
@@ -37,6 +38,7 @@ public class RenderUtil
 
 	public static void drawTexturedRect(Vector4f coords, Vector4f textureCoords)
 	{
+		glEnable(GL_TEXTURE_2D);
 		glBegin(GL_QUADS);
 		{
 			glTexCoord2f(textureCoords.x, textureCoords.y);

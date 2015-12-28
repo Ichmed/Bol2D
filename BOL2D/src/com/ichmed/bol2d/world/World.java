@@ -9,8 +9,8 @@ import org.lwjgl.util.vector.Vector2f;
 import com.ichmed.bol2d.Game;
 import com.ichmed.bol2d.entity.*;
 import com.ichmed.bol2d.entity.player.EntityPlayer;
-import com.ichmed.bol2d.render.RenderUtil;
-import com.ichmed.bol2d.util.MathUtil;
+import com.ichmed.bol2d.render.*;
+import com.ichmed.bol2d.util.*;
 
 public abstract class World
 {
@@ -78,7 +78,7 @@ public abstract class World
 			entitiesInUpdateRange = new ArrayList<Entity>();
 			for (Entity e : currentEntities)
 			{
-				if (MathUtil.compareVectorToLength(Vector2f.sub(player.getCenter(), e.getCenter(), null), UPDATE_RANGE) < 0) entitiesInUpdateRange.add(e);
+				if (MathUtil.positionsInRange(player.getCenter(), e.getCenter(), UPDATE_RANGE)) entitiesInUpdateRange.add(e);
 				else entitiesToCleanup.add(e);
 			}
 		}
@@ -95,12 +95,11 @@ public abstract class World
 		drawBackground();
 		drawAllEntities();
 		drawHud();
-		Game.updateKeyMaps();
 	}
 	
 	public void init()
 	{
-		
+		InputManager.setInputRceiver(this.player);
 	}
 
 	protected void drawBackground()
@@ -126,6 +125,11 @@ public abstract class World
 	{
 		if (this.nextEntities.remove(e)) if (e.getType() == EntityType.PARTICLE) currentParticles--;
 		this.nextEntitiesByType.get(e.getType()).remove(e);
+	}
+
+	public List<Entity> getNextEntities()
+	{
+		return nextEntities;
 	}
 
 	public List<Entity> getOverlappingEntities(Entity e, EntityType[] types)

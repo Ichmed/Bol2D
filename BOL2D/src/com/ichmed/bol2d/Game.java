@@ -13,7 +13,9 @@ import org.lwjgl.opengl.GL;
 import org.lwjgl.util.vector.Vector2f;
 
 import com.ichmed.bol2d.entity.*;
+import com.ichmed.bol2d.gui.*;
 import com.ichmed.bol2d.render.TextureLibrary;
+import com.ichmed.bol2d.util.*;
 import com.ichmed.bol2d.world.World;
 
 public abstract class Game
@@ -27,16 +29,42 @@ public abstract class Game
 		game.run();
 	}
 
+	public static void close()
+	{
+		glfwSetWindowShouldClose(window, GLFW_TRUE);
+	}
+
 	private static HashMap<Integer, Boolean> isKeyDown = new HashMap<Integer, Boolean>();
 	private static HashMap<Integer, Boolean> wasKeyDown = new HashMap<Integer, Boolean>();
 	private static HashMap<Integer, Boolean> isButtonDown = new HashMap<Integer, Boolean>();
 	private static HashMap<Integer, Boolean> wasButtonDown = new HashMap<Integer, Boolean>();
 
+	private List<IGuiElement> gui = new ArrayList<IGuiElement>();
+
 	private static int fps;
 
-	public static boolean consoleOn = false;
-	static List<String> consoleHistory = new ArrayList<String>();
-	public static String consoleIn = "";
+	private static Map<String, Float> flags = new HashMap<String, Float>();
+
+	public static float getFlag(String flag)
+	{
+		return getFlag(flag, 0);
+	}
+
+	public static float getFlag(String flag, float initialValue)
+	{
+		Float f = flags.get(flag);
+		if (f == null)
+		{
+			flags.put(flag, initialValue);
+			return initialValue;
+		}
+		return f;
+	}
+
+	public static void setFlag(String flag, float value)
+	{
+		flags.put(flag, value);
+	}
 
 	public static int getFps()
 	{
@@ -66,7 +94,7 @@ public abstract class Game
 	private GLFWMouseButtonCallback mouseCallback;
 
 	// The window handle
-	private long window;
+	private static long window;
 
 	public static Game getCurrentGame()
 	{
@@ -156,23 +184,7 @@ public abstract class Game
 				if (action == GLFW_PRESS || action == GLFW_REPEAT) isKeyDown.put(key, true);
 				if (action == GLFW_RELEASE) isKeyDown.put(key, false);
 
-				if (action == GLFW_PRESS || action == GLFW_REPEAT)
-				{
-					if (consoleOn)
-					{
-						if (key == GLFW_KEY_ESCAPE) consoleOn = false;
-						if (key >= 32 && key < 96) consoleIn += (char) key;
-						if (key == GLFW_KEY_BACKSPACE && consoleIn.length() > 1) consoleIn = consoleIn.substring(0, consoleIn.length() - 1);
-						if (key == GLFW_KEY_ENTER)
-						{
-							interpretInput(consoleIn);
-							consoleHistory.add(consoleIn);
-							consoleIn = "";
-							consoleOn = false;
-						}
-					} else if (key == GLFW_KEY_ESCAPE) glfwSetWindowShouldClose(window, GLFW_TRUE);
-					else if (key == GLFW_KEY_ENTER && !consoleOn) consoleOn = true;
-				}
+				InputManager.keyboardCallback(window, key, scancode, action, mods);
 			}
 		});
 
@@ -184,6 +196,7 @@ public abstract class Game
 			{
 				if (action == GLFW_PRESS || action == GLFW_REPEAT) isButtonDown.put(button, true);
 				if (action == GLFW_RELEASE) isButtonDown.put(button, false);
+				InputManager.mouseCallback(window, button, action, mods);
 			}
 		});
 
@@ -199,13 +212,6 @@ public abstract class Game
 
 		// Make the window visible
 		glfwShowWindow(window);
-	}
-
-	public void interpretInput(String consoleIn)
-	{
-		if (consoleIn.equals("EXIT")) glfwSetWindowShouldClose(window, GLFW_TRUE);
-		if (consoleIn.equals("KILL ALL")) for (Entity e : gameWorld.getCurrentEntities())
-			if (e.getType() != EntityType.PLAYER) e.kill();
 	}
 
 	public void run()
@@ -242,6 +248,8 @@ public abstract class Game
 			e.printStackTrace();
 		}
 
+		InputManager.init();
+		gui.add(Console.getInstance());
 		gameWorld.init();
 
 		long lastMillis = System.currentTimeMillis();
@@ -256,6 +264,9 @@ public abstract class Game
 			{
 				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 				gameWorld.update();
+				Game.updateKeyMaps();
+				for(IGuiElement e : gui)
+					e.render();
 				glfwSwapBuffers(window);
 				glfwPollEvents();
 				ticksThisSecond++;
@@ -296,8 +307,6 @@ public abstract class Game
 				ticksThisSecond = 0;
 			}
 
-			this.gameWorld.player.enableInput = !this.consoleOn;
-
 		}
 		TextureLibrary.cleanUp();
 	}
@@ -311,4 +320,6 @@ public abstract class Game
 	public abstract float getParticleRate();
 
 	public abstract int getMaxTexLibSize();
+
+	public abstract IInputReceiver getDefaultInputReceiver();
 }
