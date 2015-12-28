@@ -9,7 +9,7 @@ import org.lwjgl.util.vector.Vector2f;
 import com.ichmed.bol2d.Game;
 import com.ichmed.bol2d.entity.*;
 import com.ichmed.bol2d.entity.player.EntityPlayer;
-import com.ichmed.bol2d.render.*;
+import com.ichmed.bol2d.render.RenderUtil;
 import com.ichmed.bol2d.util.*;
 
 public abstract class World
@@ -43,6 +43,7 @@ public abstract class World
 
 		for (Entity e : entitiesToCleanup)
 			e.performCleanup();
+		entitiesToCleanup = new ArrayList<Entity>();
 	}
 
 	public void drawAllEntities()
