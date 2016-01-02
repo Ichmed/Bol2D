@@ -10,7 +10,8 @@ import com.ichmed.bol2d.Game;
 import com.ichmed.bol2d.entity.*;
 import com.ichmed.bol2d.entity.player.EntityPlayer;
 import com.ichmed.bol2d.render.RenderUtil;
-import com.ichmed.bol2d.util.*;
+import com.ichmed.bol2d.util.MathUtil;
+import com.ichmed.bol2d.util.input.InputManager;
 
 public abstract class World
 {
@@ -92,7 +93,7 @@ public abstract class World
 		// Texture.makeTexture("resc/texture/player1.png", "png");
 		glColor3f(1, 1, 1);
 		this.currentEntitiesByType = new HashMap<EntityType, List<Entity>>(this.nextEntitiesByType);
-		updateAllEntities();
+		if(!Game.isPaused())updateAllEntities();
 		drawBackground();
 		drawAllEntities();
 		drawHud();

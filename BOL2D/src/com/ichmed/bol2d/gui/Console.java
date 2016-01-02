@@ -4,10 +4,12 @@ import static org.lwjgl.glfw.GLFW.*;
 
 import java.util.*;
 
+import org.lwjgl.util.vector.Vector2f;
+
 import com.ichmed.bol2d.Game;
 import com.ichmed.bol2d.entity.Entity;
 import com.ichmed.bol2d.render.*;
-import com.ichmed.bol2d.util.InputManager;
+import com.ichmed.bol2d.util.input.InputManager;
 
 public class Console implements IGuiElement
 {
@@ -26,7 +28,7 @@ public class Console implements IGuiElement
 	@Override
 	public void render()
 	{
-		if (!InputManager.isPrimaryReceiver(this)) return;
+		if (!this.isVisible()) return;
 		RenderUtil.setColor(RenderUtil.BLACK, 0.5f);
 		RenderUtil.drawRect(-1, -1, 2, 2);
 		RenderUtil.setColor(RenderUtil.WHITE, 1);
@@ -40,7 +42,11 @@ public class Console implements IGuiElement
 	{
 		if (action == GLFW_PRESS || action == GLFW_REPEAT)
 		{
-			if (key == GLFW_KEY_ESCAPE) InputManager.yield(this);
+			if (key == GLFW_KEY_ESCAPE)
+			{
+				InputManager.yield(this);
+				Game.unpause(INSTANCE);
+			}
 			if (key == GLFW_KEY_UP && historyCounter < consoleHistory.size() - 1) consoleIn = getConsoleHistoryForIndex(historyCounter + 1);
 			else if (key == GLFW_KEY_DOWN && historyCounter > 0) consoleIn = getConsoleHistoryForIndex(historyCounter - 1);
 			else
@@ -56,7 +62,7 @@ public class Console implements IGuiElement
 					consoleIn = "";
 				}
 			}
-		} else if (key == GLFW_KEY_ESCAPE) glfwSetWindowShouldClose(window, GLFW_TRUE);
+		}
 
 		return true;
 	}
@@ -74,26 +80,25 @@ public class Console implements IGuiElement
 			e.kill();
 		else if (consoleIn.equals("PRINT ENTITIES")) for (Entity e : Game.getGameWorld().getCurrentEntities())
 			log(e.getName());
-		else if(consoleIn.startsWith("OVERRIDEKEY "))
+		else if (consoleIn.startsWith("OVERRIDEKEY "))
 		{
-			try{
+			try
+			{
 				String keyName = consoleIn.split(" ")[1];
 				boolean isPressed = Boolean.valueOf(consoleIn.split(" ")[2]);
 				char c = keyName.charAt(0);
 				Game.overrideIsKeyDown((int) c, isPressed);
-			}
-			catch(Exception e)
+			} catch (Exception e)
 			{
 				e.printStackTrace();
 				log("Use like this: OVERRRIDEKEY [KEY] [VALUE]");
 			}
-		}
-		else if (consoleIn.split(" ").length > 1) try
+		} else if (consoleIn.split(" ").length > 1) try
 		{
 			String name = consoleIn.split(" ")[0];
 			String arg = consoleIn.split(" ")[1];
-			if(arg.equals("TRUE"))Game.setFlag(name, 1);
-			else if(arg.equals("FALSE"))Game.setFlag(name, 0);
+			if (arg.equals("TRUE")) Game.setFlag(name, 1);
+			else if (arg.equals("FALSE")) Game.setFlag(name, 0);
 			else Game.setFlag(name, Float.valueOf(arg));
 		} catch (Exception e)
 		{
@@ -116,5 +121,29 @@ public class Console implements IGuiElement
 	public static void enable()
 	{
 		InputManager.setInputRceiver(INSTANCE);
+		Game.pause(INSTANCE);
+	}
+
+	@Override
+	public Vector2f getPosition()
+	{
+		return null;
+	}
+
+	@Override
+	public Vector2f getSize()
+	{
+		return null;
+	}
+
+	@Override
+	public boolean isVisible()
+	{
+		return InputManager.isPrimaryReceiver(this);
+	}
+
+	@Override
+	public void receivePriority()
+	{
 	}
 }

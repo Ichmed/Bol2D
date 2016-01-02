@@ -1,4 +1,4 @@
-package com.ichmed.bol2d.util;
+package com.ichmed.bol2d.util.input;
 
 import org.lwjgl.glfw.GLFW;
 
@@ -18,6 +18,11 @@ public class DefaultInputReceiver implements IInputReceiver
 	public boolean mouseCallback(long window, int button, int action, int mods)
 	{
 		return true;
+	}
+
+	@Override
+	public void receivePriority()
+	{		
 	}
 
 }

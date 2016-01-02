@@ -14,17 +14,20 @@ import org.lwjgl.util.vector.Vector2f;
 
 import com.ichmed.bol2d.entity.Entity;
 import com.ichmed.bol2d.gui.*;
-import com.ichmed.bol2d.render.TextureLibrary;
-import com.ichmed.bol2d.util.*;
+import com.ichmed.bol2d.render.*;
+import com.ichmed.bol2d.util.Database;
+import com.ichmed.bol2d.util.input.*;
 import com.ichmed.bol2d.world.World;
 
 public abstract class Game
 {
 	private static Game currentGame;
+	public Menu pauseScreen;
 
 	public static void startNewGame(Game game, World world)
 	{
 		Game.currentGame = game;
+		game.pauseScreen = game.getPauseScreen();
 		Game.currentGame.gameWorld = world;
 		game.run();
 	}
@@ -40,11 +43,31 @@ public abstract class Game
 	private static HashMap<Integer, Boolean> isButtonDown = new HashMap<Integer, Boolean>();
 	private static HashMap<Integer, Boolean> wasButtonDown = new HashMap<Integer, Boolean>();
 
+	private static List<Object> pausedList = new ArrayList<Object>();
+	boolean isPaused = false;
+
+	public static void pause(Object o)
+	{
+		pausedList.add(o);
+	}
+
+	public static void unpause(Object o)
+	{
+		pausedList.remove(o);
+	}
+	
+	public abstract Menu getPauseScreen();
+	
+	public static boolean isPaused()
+	{
+		return !pausedList.isEmpty();
+	}
+
 	private List<IGuiElement> gui = new ArrayList<IGuiElement>();
 
 	private static int fps;
 
-	private static Map<String, Float> flags = new HashMap<String, Float>();
+	private static Database flags = new Database();
 
 	public static float getFlag(String flag)
 	{
@@ -53,18 +76,12 @@ public abstract class Game
 
 	public static float getFlag(String flag, float initialValue)
 	{
-		Float f = flags.get(flag);
-		if (f == null)
-		{
-			flags.put(flag, initialValue);
-			return initialValue;
-		}
-		return f;
+		return flags.getFloat(flag, initialValue);
 	}
 
 	public static void setFlag(String flag, float value)
 	{
-		flags.put(flag, value);
+		flags.setFloat(flag, value);
 	}
 
 	public static int getFps()
@@ -122,9 +139,8 @@ public abstract class Game
 	public static boolean isKeyDown(int key)
 	{
 		Boolean b = isKeyDown.get(key);
-		Boolean c = isKeyDownOverride.get(key);		
-		if(c == null || c == false)
-		return b == null ? false : b;
+		Boolean c = isKeyDownOverride.get(key);
+		if (c == null || c == false) return b == null ? false : b;
 		return true;
 	}
 
@@ -254,6 +270,7 @@ public abstract class Game
 
 		InputManager.init();
 		gui.add(Console.getInstance());
+		gui.add(this.pauseScreen);
 		gameWorld.init();
 
 		long lastMillis = System.currentTimeMillis();
@@ -267,9 +284,11 @@ public abstract class Game
 			if (ticksThisSecond < TICKS_PER_SECOND)
 			{
 				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+				RenderUtil.pushMatrix();
 				gameWorld.update();
+				RenderUtil.popMatrix();
 				Game.updateKeyMaps();
-				for(IGuiElement e : gui)
+				for (IGuiElement e : gui)
 					e.render();
 				glfwSwapBuffers(window);
 				glfwPollEvents();

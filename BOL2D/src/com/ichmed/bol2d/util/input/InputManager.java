@@ -1,4 +1,4 @@
-package com.ichmed.bol2d.util;
+package com.ichmed.bol2d.util.input;
 
 import java.util.*;
 
@@ -27,6 +27,7 @@ public class InputManager
 	public static void yield(IInputReceiver receiver)
 	{
 		receivers.remove(receiver);
+		receivers.get(receivers.size() - 1).receivePriority();
 	}
 
 	public static void keyboardCallback(long window, int key, int scancode, int action, int mods)

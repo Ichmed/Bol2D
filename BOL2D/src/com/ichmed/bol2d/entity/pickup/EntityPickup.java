@@ -36,7 +36,7 @@ public abstract class EntityPickup extends Entity
 		super.onUpdate();
 	}
 
-	public abstract void pickUp(Entity e);
+	public abstract boolean pickUp(Entity e);
 
 	@Override
 	public EntityType getType()
