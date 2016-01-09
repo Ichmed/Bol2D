@@ -1,9 +1,18 @@
 package com.ichmed.bol2d.render;
 
+import java.nio.channels.SelectableChannel;
 import java.util.*;
+
+import org.lwjgl.util.vector.Vector3f;
 
 public class TextUtil
 {
+	public static enum CharType
+	{
+		DEFAULT, TEXTURE, EMPTY;
+
+	}
+
 	public static void drawText(String text, String font, float startX, float startY, float size)
 	{
 		drawText(text, font, startX, startY, size, TextOrientation.LEFT_BOUND);
@@ -22,6 +31,8 @@ public class TextUtil
 			{
 				char c = s.toCharArray()[i];
 
+				CharType charType = null;
+
 				String name;
 				if (c == '$')
 				{
@@ -34,11 +45,47 @@ public class TextUtil
 					{
 						name = s.substring(i + 2, s.indexOf(']', i + 1));
 						i += name.length() + 2;
+						if (name.startsWith("texture="))
+						{
+							name = name.substring(8);
+							charType = CharType.TEXTURE;
+						} else if (name.startsWith("color="))
+						{
+							name = name.substring(6);
+							if (name.startsWith("(") && name.endsWith(")"))
+							{
+								name = name.substring(1, name.length() - 1);
+								String[] values = name.split(",");
+								float r = Float.valueOf(values[0]);
+								float g = Float.valueOf(values[1]);
+								float b = Float.valueOf(values[2]);
+								float a = 1;
+								if(values.length > 3)
+									a = Float.valueOf(values[3]);
+								RenderUtil.setColor(new Vector3f(r, g, b), a);
+							} else RenderUtil.setColor(name);
+							charType = CharType.EMPTY;
+						}
 					} else name = "letter_" + font + "_" + getNameForChar('+');
 
-				} else name = "letter_" + font + "_" + getNameForChar(c);
-				RenderUtil.drawLibraryTextureRect(startX + posX * size, startY + posY, size, size, name);
-				if (c != '$') posX += getWidthForChar(c);
+				} else
+				{
+					name = "letter_" + font + "_" + getNameForChar(c);
+					charType = CharType.DEFAULT;
+				}
+
+				switch (charType)
+				{
+				case DEFAULT:
+					RenderUtil.drawLibraryTextureRect(startX + posX * size, startY + posY - .3f * size, size, size, name);
+					posX += getWidthForChar(c);
+					break;
+				case TEXTURE:
+					RenderUtil.drawLibraryTextureRect(startX + posX * size, startY + posY, size, size, name);
+					break;
+				default:
+					break;
+				}
 			}
 			posY -= size;
 			posX = 0;
@@ -135,12 +182,36 @@ public class TextUtil
 			return 0.45f;
 		case 'o':
 			return 0.45f;
+		case 'r':
+			return 0.35f;
+		case 't':
+			return 0.35f;
 		case 'u':
 			return 0.4f;
 		case 'W':
 			return 0.8f;
+		case '1':
+			return 0.4f;
+		case '2':
+			return 0.4f;
+		case '3':
+			return 0.4f;
+		case '4':
+			return 0.4f;
+		case '5':
+			return 0.4f;
+		case '6':
+			return 0.4f;
+		case '7':
+			return 0.4f;
+		case '9':
+			return 0.4f;
+		case '0':
+			return 0.4f;
 		case ' ':
 			return 0.3f;
+		case '\'':
+			return 0.2f;
 		default:
 			return 0.55f;
 		}

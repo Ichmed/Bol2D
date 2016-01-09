@@ -5,6 +5,20 @@ import java.util.*;
 public class Database
 {
 	private Map<String, Object> content = new HashMap<String, Object>();
+	
+	public Database(Database d)
+	{
+		this(d.content);
+	}
+	
+	public Database(Map<String, Object> content)
+	{
+		this.content = new HashMap<String, Object>(content);
+	}
+
+	public Database()
+	{
+	}
 
 	public void setFloat(String name, float value)
 	{
@@ -47,8 +61,9 @@ public class Database
 			content.put(name, initialValue);
 			f = initialValue;
 		}
-		f = f * getFloatNoMod(name + "_MUL", 1) + getFloatNoMod(name + "_ADD", 0);
-		return f;
+		float mul = getFloatNoMod(name + "_MUL", 1);
+		float add = getFloatNoMod(name + "_ADD", 0);
+		return f*  mul + add;
 	}
 	
 	public String getString(String name)

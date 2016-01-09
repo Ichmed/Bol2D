@@ -9,6 +9,7 @@ public abstract class Item
 {
 	private List<StatContainer> stats = new ArrayList<StatContainer>();
 	public String name = "please give me a name developer-senpai *-*";
+	public String description;
 
 	public abstract void init();
 
@@ -43,19 +44,6 @@ public abstract class Item
 	{
 		for (StatContainer c : stats)
 			e.modStat(c.name, -c.value);
-	}
-
-	private static class StatContainer
-	{
-		public StatContainer(String name, float value)
-		{
-			super();
-			this.name = name;
-			this.value = value;
-		}
-
-		String name;
-		float value;
 	}
 
 	public boolean isUnique()

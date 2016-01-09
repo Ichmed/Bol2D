@@ -14,6 +14,25 @@ public class GuiButton implements IGuiElement , IClickable
 	public String font = "default";
 	public boolean isVisible;
 	
+	public GuiButton(float posX, float posY, float width, float height)
+	{
+		this(posX, posY, width, height, "NO LABEL");
+	}
+	public GuiButton(float posX, float posY, float width, float height, String label)
+	{
+		this.position = new Vector2f(posX, posY);
+		this.size = new Vector2f(width, height);
+		this.label = label;
+		this.setActionHandler(new ActionHandler()
+		{			
+			@Override
+			public void leftClick()
+			{
+				setLabel("NO HANDLER");
+			}
+		});
+	}
+	
 	private boolean clicked;
 	
 	private ActionHandler actionHandler;
@@ -66,10 +85,15 @@ public class GuiButton implements IGuiElement , IClickable
 	@Override
 	public void render()
 	{
-		RenderUtil.setColor(RenderUtil.WHITE, 1);
-		RenderUtil.drawRect(position.x, position.y, size.x, size.y);
+		renderBackground();
 		RenderUtil.setColor(RenderUtil.BLACK, 1);
 		TextUtil.drawText(label, font, position.x + size.x / 2, position.y, size.y, TextOrientation.CENTERED);
+	}
+	
+	protected void renderBackground()
+	{
+		RenderUtil.setColor(RenderUtil.WHITE, 1);
+		RenderUtil.drawRect(position.x, position.y, size.x, size.y);		
 	}
 
 	@Override
@@ -132,6 +156,10 @@ public class GuiButton implements IGuiElement , IClickable
 	public void reset()
 	{
 		this.clicked = false;
+	}
+	@Override
+	public void update()
+	{
 	}
 
 }

@@ -20,6 +20,8 @@ public class Console implements IGuiElement
 	public static String consoleIn = "";
 	int historyCounter;
 
+	private boolean promptFlicker = true;
+
 	public static Console getInstance()
 	{
 		return INSTANCE;
@@ -34,19 +36,23 @@ public class Console implements IGuiElement
 		RenderUtil.setColor(RenderUtil.WHITE, 1);
 		int count = screen.length() - screen.replace("\n", "").length();
 		TextUtil.drawText(screen, "default", -1, (count) * 0.05f - 1, 0.05f);
-		TextUtil.drawText(">" + consoleIn + "_", "default", -1, -1, .05f);
+		String t = ">" + consoleIn;
+		if (Game.getTicksTotal() % 30 == 0) promptFlicker = !promptFlicker;
+		if (promptFlicker) t += "_";
+		TextUtil.drawText(t, "default", -1, -1, .05f);
 	}
 
 	@Override
 	public boolean keyboardCallback(long window, int key, int scancode, int action, int mods)
 	{
+		if (action == GLFW_RELEASE && key == GLFW_KEY_ESCAPE)
+		{
+			InputManager.yield(this);
+			Game.unpause(INSTANCE);
+		}
 		if (action == GLFW_PRESS || action == GLFW_REPEAT)
 		{
-			if (key == GLFW_KEY_ESCAPE)
-			{
-				InputManager.yield(this);
-				Game.unpause(INSTANCE);
-			}
+
 			if (key == GLFW_KEY_UP && historyCounter < consoleHistory.size() - 1) consoleIn = getConsoleHistoryForIndex(historyCounter + 1);
 			else if (key == GLFW_KEY_DOWN && historyCounter > 0) consoleIn = getConsoleHistoryForIndex(historyCounter - 1);
 			else
@@ -110,6 +116,7 @@ public class Console implements IGuiElement
 	public static void log(String s)
 	{
 		screen += (s + "\n");
+		System.out.println(s);
 	}
 
 	@Override
@@ -144,6 +151,11 @@ public class Console implements IGuiElement
 
 	@Override
 	public void receivePriority()
+	{
+	}
+
+	@Override
+	public void update()
 	{
 	}
 }

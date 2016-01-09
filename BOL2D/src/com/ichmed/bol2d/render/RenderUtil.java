@@ -2,6 +2,8 @@ package com.ichmed.bol2d.render;
 
 import static org.lwjgl.opengl.GL11.*;
 
+import java.util.*;
+
 import org.lwjgl.util.vector.*;
 
 import com.ichmed.bol2d.entity.Entity;
@@ -9,15 +11,43 @@ import com.ichmed.bol2d.util.MathUtil;
 
 public class RenderUtil
 {
-	public static final Vector3f WHITE = new Vector3f(1, 1, 1);
+	private static Map<String, Vector3f> colors = new HashMap<String, Vector3f>();
+	
 	public static final Vector3f RED = new Vector3f(1, 0, 0);
+	public static final Vector3f GREEN = new Vector3f(0, 1, 0);
+	public static final Vector3f BLUE = new Vector3f(0, 0, 1);
+	public static final Vector3f YELLOW = new Vector3f(1, 1, 0);
 	public static final Vector3f CYAN = new Vector3f(0, 1, 1);
+	public static final Vector3f MAGENTA = new Vector3f(1, 0, 1);
+	
+	public static final Vector3f WHITE = new Vector3f(1, 1, 1);
 	public static final Vector3f BLACK = new Vector3f(0, 0, 0);
+	
+	static
+	{
+		colors.put("RED", RED);
+		colors.put("GREEN", GREEN);
+		colors.put("BLUE", BLUE);
+		colors.put("YELLOW", YELLOW);
+		colors.put("CYAN", CYAN);
+		colors.put("MAGENTA", MAGENTA);
+		
+		colors.put("WHITE", WHITE);
+		colors.put("BLACK", BLACK);
+	}
 
 	public static void drawLibraryTextureRect(double x, double y, double width, double height, String name)
 	{
+		String libName = "default";
+		if(name.split("\\$").length > 1)
+		{
+			libName = name.split("\\$")[0];
+			name = name.split("\\$")[1];
+		}
 		glEnable(GL_TEXTURE_2D);
-		Vector4f v = TextureLibrary.getCoordinates(name);
+		TextureLibrary t = TextureLibrary.getTextureLibrary(libName);
+		t.bind();
+		Vector4f v = t.getCoordinates(name);
 		float x1 = 1 - v.x;
 		float y1 = 1 - v.y;
 		float x2 = 1 - (v.x + v.z);
@@ -82,6 +112,11 @@ public class RenderUtil
 	public static void resetLastEntityCentered()
 	{
 		lastEntityCentered = null;
+	}
+	
+	public static void setColor(String color)
+	{
+		setColor(colors.get(color));
 	}
 
 	public static void setColor(Vector3f color)

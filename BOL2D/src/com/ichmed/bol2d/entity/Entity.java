@@ -8,7 +8,7 @@ import com.ichmed.bol2d.Game;
 import com.ichmed.bol2d.entity.ai.behaviour.*;
 import com.ichmed.bol2d.entity.damage.*;
 import com.ichmed.bol2d.render.RenderContainerEntity;
-import com.ichmed.bol2d.util.MathUtil;
+import com.ichmed.bol2d.util.*;
 
 public abstract class Entity
 {
@@ -36,7 +36,7 @@ public abstract class Entity
 	public boolean spawnDebrisOnDeath = true;
 	public boolean isInmoveable = false;
 
-	private HashMap<String, Float> stats = new HashMap<String, Float>();
+	private Database stats = new Database();
 
 	public Entity target = null;
 	private int ticksExisted;
@@ -66,7 +66,7 @@ public abstract class Entity
 		for (int i = 0; i < renderContainers.length; i++)
 			renderContainers[i] = getRenderContainers(i);
 		initStats();
-		this.healthSystem = getHealthSystem(stats.get("MAX_HEALTH"));
+		this.healthSystem = getHealthSystem(stats.getFloat("MAX_HEALTH"));
 	}
 
 	protected List<RenderContainerEntity> getRenderContainers(int layer)
@@ -132,7 +132,7 @@ public abstract class Entity
 			e.color = new Vector3f(this.color);
 			e.spawnDebrisOnDeath = this.spawnDebrisOnDeath;
 			e.textureName = this.textureName;
-			e.stats = new HashMap<String, Float>(this.stats);
+			e.stats = new Database(this.stats);
 			return e;
 		} catch (Exception e)
 		{
@@ -148,13 +148,7 @@ public abstract class Entity
 
 	public float getStat(String stat, float initValue)
 	{
-		Float f = stats.get(stat);
-		if (f == null)
-		{
-			stats.put(stat, initValue);
-			return initValue;
-		}
-		return f;
+		return stats.getFloat(stat, initValue);
 	}
 
 	public void modStat(String stat, float mod)
@@ -164,10 +158,7 @@ public abstract class Entity
 
 	public void modStat(String stat, float mod, float initValue)
 	{
-		Float f = getStat(stat, initValue);
-		f += mod;
-		stats.put(stat, f);
-
+		stats.modFloat(stat, mod, initValue);
 	}
 
 	public void initStats()
@@ -177,7 +168,7 @@ public abstract class Entity
 
 	public void setStat(String stat, float value)
 	{
-		stats.put(stat, value);
+		stats.setFloat(stat, value);
 	}
 
 	public void draw(int i)

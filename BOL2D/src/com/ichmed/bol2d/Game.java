@@ -63,7 +63,7 @@ public abstract class Game
 		return !pausedList.isEmpty();
 	}
 
-	private List<IGuiElement> gui = new ArrayList<IGuiElement>();
+	public List<IGuiElement> gui = new ArrayList<IGuiElement>();
 
 	private static int fps;
 
@@ -98,6 +98,8 @@ public abstract class Game
 	{
 		return ticksThisSecond;
 	}
+	
+	public abstract void initGameData();
 
 	private int ticksTotal;
 	static long lastSecond = System.currentTimeMillis();
@@ -262,12 +264,13 @@ public abstract class Game
 
 		try
 		{
-			TextureLibrary.init("resc/texture/", shouldShowTextureStiching());
+			TextureLibrary.createLibrary("default", "resc/texture/default/", shouldShowTextureStiching());
 		} catch (Exception e)
 		{
 			e.printStackTrace();
 		}
 
+		currentGame.initGameData();
 		InputManager.init();
 		gui.add(Console.getInstance());
 		gui.add(this.pauseScreen);
@@ -289,7 +292,10 @@ public abstract class Game
 				RenderUtil.popMatrix();
 				Game.updateKeyMaps();
 				for (IGuiElement e : gui)
+				{
+					e.update();
 					e.render();
+				}
 				glfwSwapBuffers(window);
 				glfwPollEvents();
 				ticksThisSecond++;
@@ -331,7 +337,7 @@ public abstract class Game
 			}
 
 		}
-		TextureLibrary.cleanUp();
+		TextureLibrary.cleanUpAll();
 	}
 
 	public abstract boolean shouldShowTextureStiching();

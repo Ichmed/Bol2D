@@ -11,18 +11,35 @@ import javax.imageio.ImageIO;
 import org.lwjgl.util.vector.Vector4f;
 
 import com.ichmed.bol2d.Game;
+import com.ichmed.bol2d.gui.Console;
 
 public class TextureLibrary
 {
-	private static HashMap<String, Vector4f> textureCoordinates;
-	private static Texture textureGL;
-	private static BufferedImage textureAWT;
-	private static int size;
+	private HashMap<String, Vector4f> textureCoordinates;
+	private Texture textureGL;
+	private BufferedImage textureAWT;
+	private int size;
 	static boolean log;
-	private static String libPath;
+	private String libPath;
 
-	public static void init(String path ,boolean showStiching) throws IOException
+	private static Map<String, TextureLibrary> libraries = new HashMap<String, TextureLibrary>();
+
+	private String name;
+
+	public static void createLibrary(String name, String path, boolean showStiching) throws IOException
 	{
+		if (!path.endsWith("/")) path += "/";
+		libraries.put(name, new TextureLibrary(name, path, showStiching));
+	}
+
+	public static TextureLibrary getTextureLibrary(String name)
+	{
+		return libraries.get(name);
+	}
+
+	public TextureLibrary(String name, String path, boolean showStiching) throws IOException
+	{
+		this.name = name;
 		textureCoordinates = new HashMap<String, Vector4f>();
 		log = showStiching;
 		libPath = path;
@@ -61,7 +78,7 @@ public class TextureLibrary
 			while (sc.hasNextLine())
 			{
 				s = sc.nextLine();
-				if(log)System.out.println("Generating " + s);
+				if (log) Console.log(("Generating " + s));
 				int size;
 				String nameAWT;
 				String nameTexture;
@@ -96,22 +113,31 @@ public class TextureLibrary
 		return l;
 	}
 
-	public static void cleanUp()
+	public static void cleanUpAll()
+	{
+		for (TextureLibrary t : libraries.values())
+		{
+			Console.log("Saving texture library \"" + t.name + "\"");
+			t.cleanUp();
+		}
+	}
+
+	public void cleanUp()
 	{
 		try
 		{
-			ImageIO.write(textureAWT, "png", new File(libPath + "library1.png"));
+			ImageIO.write(textureAWT, "png", new File(libPath + this.name + ".png"));
 		} catch (IOException e)
 		{
 			e.printStackTrace();
 		}
 	}
 
-	private static void loadLibrary(String path)
+	private void loadLibrary(String path)
 	{
 	}
 
-	private static boolean placeTexturesRecursivSkipFirst(Graphics2D g2d, List<TextureData> raw) throws IOException
+	private boolean placeTexturesRecursivSkipFirst(Graphics2D g2d, List<TextureData> raw) throws IOException
 	{
 		if (raw.size() == 0) return true;
 		if (raw.size() < 2) return false;
@@ -126,7 +152,7 @@ public class TextureLibrary
 		return false;
 	}
 
-	private static boolean placeTexturesRecursiv(Graphics2D g2d, List<TextureData> raw) throws IOException
+	private boolean placeTexturesRecursiv(Graphics2D g2d, List<TextureData> raw) throws IOException
 	{
 		if (raw.size() == 0) return true;
 		if (tryToPlaceImage(g2d, raw.get(0)))
@@ -150,7 +176,7 @@ public class TextureLibrary
 		g2d.drawRect((int) v.x, (int) v.y, (int) v.z, (int) v.w);
 	}
 
-	public static boolean tryToPlaceImage(Graphics2D g2d, TextureData data)
+	public boolean tryToPlaceImage(Graphics2D g2d, TextureData data)
 	{
 		for (int i = 0; i < size; i++)
 			for (int j = 0; j < size; j++)
@@ -158,7 +184,7 @@ public class TextureLibrary
 				{
 					int x = j;
 					int y = i;
-					if(log)System.out.println("Placed " + data.name);
+					if (log) Console.log("Placed " + data.name);
 					for (int k = 0; k < data.awtImg.getWidth(); k++)
 						for (int l = 0; l < data.awtImg.getHeight(); l++)
 						{
@@ -171,7 +197,7 @@ public class TextureLibrary
 		return false;
 	}
 
-	private static boolean spotIsEmpty(int x, int y, int width, int height)
+	private boolean spotIsEmpty(int x, int y, int width, int height)
 	{
 		for (int i = 0; i < width; i++)
 			for (int j = 0; j < height; j++)
@@ -181,22 +207,23 @@ public class TextureLibrary
 		return true;
 	}
 
-	public static boolean isPixelTransparent(int x, int y)
+	public boolean isPixelTransparent(int x, int y)
 	{
 		if (x >= size || y >= size) return false;
 		Color c = new Color(textureAWT.getRGB(x, y));
 		return c.getRed() == 255 && c.getBlue() == 255;
 	}
 
-	private static boolean needsRefreshing(File lib, File raw)
+	private boolean needsRefreshing(File lib, File raw)
 	{
 		for (File f : raw.listFiles())
 			if (f.lastModified() > lib.lastModified()) return true;
 		return false;
 	}
 
-	public static Vector4f getCoordinates(String textureName)
+	public Vector4f getCoordinates(String textureName)
 	{
+		if (!textureCoordinates.containsKey(textureName)) Console.log(this.name + " does not contain " + textureName);
 		Vector4f v = new Vector4f(textureCoordinates.get(textureName));
 		v.scale(1f / size);
 		return v;
@@ -213,11 +240,10 @@ public class TextureLibrary
 			this.awtImg = awtImg;
 			this.name = name;
 		}
-
 	}
 
-	public static void bind()
+	public void bind()
 	{
-		textureGL.bind();
+		this.textureGL.bind();
 	}
 }

@@ -7,7 +7,7 @@ public class RandomArrayPool<T> implements RandomPool<T>
 	private int size;
 	private int amount;
 	
-	private List<T> content = new ArrayList<T>();
+	private List<Container<T>> content = new ArrayList<Container<T>>();
 
 	private final Random randomGen;
 	
@@ -25,13 +25,21 @@ public class RandomArrayPool<T> implements RandomPool<T>
 	{
 		amount++;
 		for(int i = 0; i < weight; i++)
-			content.add(t);
+			content.add(new Container<T>(weight, t));
 		size += weight;
+		content.sort(new Comparator<Container<T>>()
+		{
+			@Override
+			public int compare(Container<T> o1, Container<T> o2)
+			{
+				return o1.weight == o2.weight ? 0 : o1.weight > o2.weight ? -1 : 1;
+			}
+		});
 	}
 
 	public T get(int value)
 	{
-		return content.get(value);
+		return content.get(value).entry;
 	}
 
 	public T getRandom()
@@ -47,6 +55,18 @@ public class RandomArrayPool<T> implements RandomPool<T>
 	public int amount()
 	{
 		return amount;
+	}
+	
+	private static class Container<T>
+	{
+		public Container(int weight, T entry)
+		{
+			super();
+			this.weight = weight;
+			this.entry = entry;
+		}
+		public int weight;
+		T entry;
 	}
 
 }

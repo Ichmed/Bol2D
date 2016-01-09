@@ -10,4 +10,6 @@ public interface IGuiElement extends IRenderContainer, IInputReceiver
 	public Vector2f getPosition();
 	public Vector2f getSize();
 	public boolean isVisible();
+	
+	public void update();
 }
