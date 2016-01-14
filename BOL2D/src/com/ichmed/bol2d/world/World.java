@@ -174,7 +174,7 @@ public abstract class World
 			list = l;
 		}
 
-		list.sort(new Comparator<Entity>()
+		Collections.sort(list, new Comparator<Entity>()
 		{
 			@Override
 			public int compare(Entity o1, Entity o2)
