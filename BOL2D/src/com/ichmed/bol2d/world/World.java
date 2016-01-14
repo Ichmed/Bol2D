@@ -164,7 +164,7 @@ public abstract class World
 		return sortListByDistance(center, list, -1);
 	}
 
-	public List<Entity> sortListByDistance(Entity center, List<Entity> list, float maxDist)
+	public List<Entity> sortListByDistance(final Entity center, List<Entity> list, float maxDist)
 	{
 		if (maxDist >= 0)
 		{
