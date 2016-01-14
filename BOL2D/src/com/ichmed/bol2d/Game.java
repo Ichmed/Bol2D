@@ -22,52 +22,42 @@ import com.ichmed.bol2d.world.World;
 public abstract class Game
 {
 	private static Game currentGame;
-	public Menu pauseScreen;
+	private static Vector2f cursorPos;
 
-	public static void startNewGame(Game game, World world)
-	{
-		Game.currentGame = game;
-		game.pauseScreen = game.getPauseScreen();
-		Game.currentGame.gameWorld = world;
-		game.run();
-	}
+	private static Database flags = new Database();
+
+	private static int fps;
+
+	private static HashMap<Integer, Boolean> isButtonDown = new HashMap<Integer, Boolean>();
+	private static HashMap<Integer, Boolean> isKeyDown = new HashMap<Integer, Boolean>();
+	private static HashMap<Integer, Boolean> isKeyDownOverride = new HashMap<Integer, Boolean>();
+	static long lastSecond = System.currentTimeMillis();
+	private static List<Object> pausedList = new ArrayList<Object>();
+
+	static final int TICKS_PER_SECOND = 60;
+	private static int ticksThisSecond;
+
+	private static HashMap<Integer, Boolean> wasButtonDown = new HashMap<Integer, Boolean>();
+
+	private static HashMap<Integer, Boolean> wasKeyDown = new HashMap<Integer, Boolean>();
+
+	// The window handle
+	private static long window;
 
 	public static void close()
 	{
 		glfwSetWindowShouldClose(window, GLFW_TRUE);
 	}
 
-	private static HashMap<Integer, Boolean> isKeyDown = new HashMap<Integer, Boolean>();
-	private static HashMap<Integer, Boolean> isKeyDownOverride = new HashMap<Integer, Boolean>();
-	private static HashMap<Integer, Boolean> wasKeyDown = new HashMap<Integer, Boolean>();
-	private static HashMap<Integer, Boolean> isButtonDown = new HashMap<Integer, Boolean>();
-	private static HashMap<Integer, Boolean> wasButtonDown = new HashMap<Integer, Boolean>();
-
-	private static List<Object> pausedList = new ArrayList<Object>();
-	boolean isPaused = false;
-
-	public static void pause(Object o)
+	public static Game getCurrentGame()
 	{
-		pausedList.add(o);
+		return currentGame;
 	}
 
-	public static void unpause(Object o)
+	public static Vector2f getCursorPosition()
 	{
-		pausedList.remove(o);
+		return new Vector2f(cursorPos);
 	}
-	
-	public abstract Menu getPauseScreen();
-	
-	public static boolean isPaused()
-	{
-		return !pausedList.isEmpty();
-	}
-
-	public List<IGuiElement> gui = new ArrayList<IGuiElement>();
-
-	private static int fps;
-
-	private static Database flags = new Database();
 
 	public static float getFlag(String flag)
 	{
@@ -79,46 +69,9 @@ public abstract class Game
 		return flags.getFloat(flag, initialValue);
 	}
 
-	public static void setFlag(String flag, float value)
-	{
-		flags.setFloat(flag, value);
-	}
-
 	public static int getFps()
 	{
 		return fps;
-	}
-
-	private static Vector2f cursorPos;
-
-	static final int TICKS_PER_SECOND = 60;
-	private static int ticksThisSecond;
-
-	public static int getTicksThisSecond()
-	{
-		return ticksThisSecond;
-	}
-	
-	public abstract void initGameData();
-
-	private int ticksTotal;
-	static long lastSecond = System.currentTimeMillis();
-
-	int WIDTH = 800;
-	int HEIGHT = 800;
-
-	// We need to strongly reference callback instances.
-	private GLFWErrorCallback errorCallback;
-
-	private GLFWKeyCallback keyCallback;
-	private GLFWMouseButtonCallback mouseCallback;
-
-	// The window handle
-	private static long window;
-
-	public static Game getCurrentGame()
-	{
-		return currentGame;
 	}
 
 	public static World getGameWorld()
@@ -126,16 +79,20 @@ public abstract class Game
 		return currentGame.getCurrentGameWorld();
 	}
 
-	private World gameWorld;
-
-	protected World getCurrentGameWorld()
+	public static int getTicksThisSecond()
 	{
-		return gameWorld;
+		return ticksThisSecond;
 	}
 
 	public static int getTicksTotal()
 	{
 		return currentGame.ticksTotal;
+	}
+
+	public static boolean isButtonDown(int key)
+	{
+		Boolean b = isButtonDown.get(key);
+		return b == null ? false : b;
 	}
 
 	public static boolean isKeyDown(int key)
@@ -146,15 +103,42 @@ public abstract class Game
 		return true;
 	}
 
-	public static boolean isButtonDown(int key)
+	public static boolean isPaused()
 	{
-		Boolean b = isButtonDown.get(key);
-		return b == null ? false : b;
+		return !pausedList.isEmpty();
 	}
 
-	public static Vector2f getCursorPosition()
+	public static void overrideIsKeyDown(Integer key, Boolean value)
 	{
-		return new Vector2f(cursorPos);
+		isKeyDownOverride.put(key, value);
+	}
+
+	public static void pause(Object o)
+	{
+		pausedList.add(o);
+	}
+
+	public static void setFlag(String flag, float value)
+	{
+		flags.setFloat(flag, value);
+	}
+
+	public static void startNewGame(Game game, World world)
+	{
+		Game.currentGame = game;
+		game.pauseScreen = game.getPauseScreen();
+		Game.currentGame.gameWorld = world;
+		game.run();
+	}
+
+	public static void unpause(Object o)
+	{
+		pausedList.remove(o);
+	}
+
+	public static void updateKeyMaps()
+	{
+		wasKeyDown = new HashMap<Integer, Boolean>(isKeyDown);
 	}
 
 	public static boolean wasKeyPressed(int key)
@@ -175,10 +159,46 @@ public abstract class Game
 		return was == true && is == false;
 	}
 
-	public static void updateKeyMaps()
+	// We need to strongly reference callback instances.
+	private GLFWErrorCallback errorCallback;
+
+	private World gameWorld;
+
+	@SuppressWarnings("unchecked")
+	public List<IGuiElement>[] gui = new List[10];
+
+	int HEIGHT = 1000;
+
+	boolean isPaused = false;
+
+	private GLFWKeyCallback keyCallback;
+
+	long lastMillis = System.currentTimeMillis();
+
+	private GLFWMouseButtonCallback mouseCallback;
+
+	public Menu pauseScreen;
+
+	private int ticksTotal;
+
+	int WIDTH = 1000;
+
+	protected World getCurrentGameWorld()
 	{
-		wasKeyDown = new HashMap<Integer, Boolean>(isKeyDown);
+		return gameWorld;
 	}
+
+	public abstract IInputReceiver getDefaultInputReceiver();
+
+	public abstract int getMaxTexLibSize();
+
+	public abstract int getParticleMax();
+
+	public abstract float getParticleRate();
+
+	public abstract Menu getPauseScreen();
+
+	public abstract float getRotationUpdateInterval();
 
 	private void init()
 	{
@@ -236,12 +256,76 @@ public abstract class Game
 		glfwShowWindow(window);
 	}
 
+	public abstract void initGameData();
+
+	protected void loop()
+	{
+		DoubleBuffer x = BufferUtils.createDoubleBuffer(1);
+		DoubleBuffer y = BufferUtils.createDoubleBuffer(1);
+		glfwGetCursorPos(window, x, y);
+		cursorPos = new Vector2f((float) (x.get() - WIDTH / 2) / (WIDTH / 2), -(float) (y.get() - HEIGHT / 2) / (HEIGHT / 2));
+
+		if (ticksThisSecond < TICKS_PER_SECOND)
+		{
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			RenderUtil.pushMatrix();
+			gameWorld.update();
+			RenderUtil.popMatrix();
+			Game.updateKeyMaps();
+			for (int i = 0; i < gui.length; i++)
+				for (IGuiElement e : gui[i])
+				{
+					e.update();
+					if (e.isVisible()) e.render();
+				}
+			glfwSwapBuffers(window);
+			glfwPollEvents();
+			ticksThisSecond++;
+			ticksTotal++;
+			long m = System.currentTimeMillis();
+			long n = lastMillis + (1000 / 60);
+			long l = n - m;
+			if (l > 0) try
+			{
+				Thread.sleep(l);
+			} catch (InterruptedException e)
+			{
+				e.printStackTrace();
+			}
+			lastMillis = System.currentTimeMillis();
+		} else
+		{
+			if (lastSecond + 1000L < System.currentTimeMillis())
+			{
+				for (Entity e : gameWorld.getCurrentEntities())
+					e.performCleanup();
+
+			} else
+			{
+				try
+				{
+					Thread.sleep(lastSecond + 1000L - System.currentTimeMillis());
+				} catch (InterruptedException e)
+				{
+					e.printStackTrace();
+				}
+			}
+		}
+		if (System.currentTimeMillis() >= lastSecond + 1000)
+		{
+			lastSecond = System.currentTimeMillis();
+			fps = ticksThisSecond;
+			ticksThisSecond = 0;
+		}
+
+	}
+
 	public void run()
 	{
 		try
 		{
 			init();
-			loop();
+			runGame();
 
 			// Release window and window callbacks
 			glfwDestroyWindow(window);
@@ -254,7 +338,7 @@ public abstract class Game
 		}
 	}
 
-	private void loop()
+	private void runGame()
 	{
 		GL.createCapabilities();
 		glClearColor(.004f, 0.0f, 0.1f, 0.0f);
@@ -270,90 +354,26 @@ public abstract class Game
 			e.printStackTrace();
 		}
 
+		for (int i = 0; i < gui.length; i++)
+			gui[i] = new ArrayList<IGuiElement>();
+
 		currentGame.initGameData();
 		InputManager.init();
-		gui.add(Console.getInstance());
-		gui.add(this.pauseScreen);
+		gui[9].add(Console.getInstance());
+		gui[8].add(this.pauseScreen);
 		gameWorld.init();
 
-		long lastMillis = System.currentTimeMillis();
 		while (glfwWindowShouldClose(window) == GLFW_FALSE)
 		{
-			DoubleBuffer x = BufferUtils.createDoubleBuffer(1);
-			DoubleBuffer y = BufferUtils.createDoubleBuffer(1);
-			glfwGetCursorPos(window, x, y);
-			cursorPos = new Vector2f((float) (x.get() - WIDTH / 2) / (WIDTH / 2), -(float) (y.get() - HEIGHT / 2) / (HEIGHT / 2));
-
-			if (ticksThisSecond < TICKS_PER_SECOND)
-			{
-				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-				RenderUtil.pushMatrix();
-				gameWorld.update();
-				RenderUtil.popMatrix();
-				Game.updateKeyMaps();
-				for (IGuiElement e : gui)
-				{
-					e.update();
-					e.render();
-				}
-				glfwSwapBuffers(window);
-				glfwPollEvents();
-				ticksThisSecond++;
-				ticksTotal++;
-				long m = System.currentTimeMillis();
-				long n = lastMillis + (1000 / 60);
-				long l = n - m;
-				if (l > 0) try
-				{
-					Thread.sleep(l);
-				} catch (InterruptedException e)
-				{
-					e.printStackTrace();
-				}
-				lastMillis = System.currentTimeMillis();
-			} else
-			{
-				if (lastSecond + 1000L < System.currentTimeMillis())
-				{
-					for (Entity e : gameWorld.getCurrentEntities())
-						e.performCleanup();
-
-				} else
-				{
-					try
-					{
-						Thread.sleep(lastSecond + 1000L - System.currentTimeMillis());
-					} catch (InterruptedException e)
-					{
-						e.printStackTrace();
-					}
-				}
-			}
-			if (System.currentTimeMillis() >= lastSecond + 1000)
-			{
-				lastSecond = System.currentTimeMillis();
-				fps = ticksThisSecond;
-				ticksThisSecond = 0;
-			}
-
+			loop();
 		}
 		TextureLibrary.cleanUpAll();
 	}
 
 	public abstract boolean shouldShowTextureStiching();
 
-	public abstract float getRotationUpdateInterval();
-
-	public abstract int getParticleMax();
-
-	public abstract float getParticleRate();
-
-	public abstract int getMaxTexLibSize();
-
-	public abstract IInputReceiver getDefaultInputReceiver();
-
-	public static void overrideIsKeyDown(Integer key, Boolean value)
+	public static void addGui(IGuiElement e, int i)
 	{
-		isKeyDownOverride.put(key, value);
+		getCurrentGame().gui[i].add(e);
 	}
 }

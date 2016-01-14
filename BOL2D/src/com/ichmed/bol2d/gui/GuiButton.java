@@ -6,22 +6,30 @@ import org.lwjgl.util.vector.Vector2f;
 import com.ichmed.bol2d.render.*;
 import com.ichmed.bol2d.render.TextUtil.TextOrientation;
 
-public class GuiButton implements IGuiElement , IClickable
+public class GuiButton extends DefaultGuiElement implements IClickable
 {
 	public String label = "[SET_LABEL]";
-	public Vector2f position = new Vector2f();
-	public Vector2f size = new Vector2f();
 	public String font = "default";
 	public boolean isVisible;
 	
+	IGuiElement parent = null;
+	
+	public IGuiElement getParent()
+	{
+		return parent;
+	}
+	public void setParent(IGuiElement parent)
+	{
+		this.parent = parent;
+	}
 	public GuiButton(float posX, float posY, float width, float height)
 	{
 		this(posX, posY, width, height, "NO LABEL");
 	}
 	public GuiButton(float posX, float posY, float width, float height, String label)
 	{
-		this.position = new Vector2f(posX, posY);
-		this.size = new Vector2f(width, height);
+		this.setPosition(new Vector2f(posX, posY));
+		this.setSize(new Vector2f(width, height));
 		this.label = label;
 		this.setActionHandler(new ActionHandler()
 		{			
@@ -67,16 +75,6 @@ public class GuiButton implements IGuiElement , IClickable
 		this.actionHandler = actionHandler;
 	}
 
-	public void setPosition(Vector2f position)
-	{
-		this.position = position;
-	}
-
-	public void setSize(Vector2f size)
-	{
-		this.size = size;
-	}
-
 	public void setVisible(boolean isVisible)
 	{
 		this.isVisible = isVisible;
@@ -87,14 +85,15 @@ public class GuiButton implements IGuiElement , IClickable
 	{
 		renderBackground();
 		RenderUtil.setColor(RenderUtil.BLACK, 1);
-		TextUtil.drawText(label, font, position.x + size.x / 2, position.y, size.y, TextOrientation.CENTERED);
+		TextUtil.drawText(label, font, this.getPosition().x + this.getSize().x / 2, this.getPosition().y, this.getSize().y, TextOrientation.CENTERED);
 	}
 	
 	protected void renderBackground()
 	{
 		RenderUtil.setColor(RenderUtil.WHITE, 1);
-		RenderUtil.drawRect(position.x, position.y, size.x, size.y);		
+		RenderUtil.drawRect(this.getPosition().x, this.getPosition().y, this.getSize().x, this.getSize().y);		
 	}
+	
 
 	@Override
 	public boolean keyboardCallback(long window, int key, int scancode, int action, int mods)
@@ -106,18 +105,6 @@ public class GuiButton implements IGuiElement , IClickable
 	public boolean mouseCallback(long window, int button, int action, int mods)
 	{
 		return false;
-	}
-
-	@Override
-	public Vector2f getPosition()
-	{
-		return position;
-	}
-
-	@Override
-	public Vector2f getSize()
-	{
-		return size;
 	}
 
 	public static abstract class ActionHandler

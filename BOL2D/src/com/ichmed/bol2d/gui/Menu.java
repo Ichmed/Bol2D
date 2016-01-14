@@ -10,6 +10,11 @@ public class Menu extends GuiContainer
 {
 	public boolean isVisible;
 	
+	public Menu()
+	{
+		this.setPosition(new Vector2f(-1, -1));
+	}
+	
 	@Override
 	public boolean keyboardCallback(long window, int key, int scancode, int action, int mods)
 	{
@@ -19,8 +24,6 @@ public class Menu extends GuiContainer
 
 	public void enable()
 	{
-		Game g = Game.getCurrentGame();
-		if(!g.gui.contains(this))g.gui.add(this);
 		this.isVisible = true;
 		Game.pause(this);
 		InputManager.setInputRceiver(this);
@@ -32,13 +35,7 @@ public class Menu extends GuiContainer
 		Game.unpause(this);
 		InputManager.yield(this);
 	}
-
-	@Override
-	public Vector2f getPosition()
-	{
-		return new Vector2f(-1, -1);
-	}
-
+	
 	@Override
 	public Vector2f getSize()
 	{
@@ -52,18 +49,23 @@ public class Menu extends GuiContainer
 	}
 
 	@Override
-	protected void renderBackground()
-	{
-	}
-
-	@Override
 	public void receivePriority()
 	{
 		this.isVisible = true;
 	}
+	@Override
+	public IGuiElement getParent()
+	{
+		return null;
+	}
 
 	@Override
-	public void update()
+	public void setParent(IGuiElement parent)
+	{
+	}
+
+	@Override
+	protected void renderBackground()
 	{
 	}
 }

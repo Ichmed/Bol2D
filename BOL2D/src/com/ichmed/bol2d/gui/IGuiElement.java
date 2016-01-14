@@ -11,5 +11,8 @@ public interface IGuiElement extends IRenderContainer, IInputReceiver
 	public Vector2f getSize();
 	public boolean isVisible();
 	
+	public void setParent(IGuiElement parent);
+	public IGuiElement getParent();
+	
 	public void update();
 }

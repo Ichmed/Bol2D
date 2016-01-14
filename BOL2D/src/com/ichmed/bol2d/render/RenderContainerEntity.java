@@ -3,17 +3,19 @@ package com.ichmed.bol2d.render;
 import org.lwjgl.util.vector.*;
 
 import com.ichmed.bol2d.entity.Entity;
+import com.ichmed.bol2d.gui.Console;
+import com.ichmed.bol2d.render.animation.*;
 
 public class RenderContainerEntity implements IRenderContainer
 {
-	Entity owner;
+	public Entity owner;
 	boolean useEntityRotation;
 	boolean useEntityColor;
-	private String textureName;
+	private String textureName = "";
 	private Vector2f translate;
 	private float rotation;
-	private Vector3f color;
-	
+	private Vector3f color = RenderUtil.WHITE;
+		
 	public RenderContainerEntity(Entity owner, boolean useEntityRotation, boolean useEntityColor, String textureName, Vector2f translate)
 	{
 		super();
@@ -38,5 +40,15 @@ public class RenderContainerEntity implements IRenderContainer
 		RenderUtil.translate(new Vector2f(-owner.getSize().getX() / 2000f, -owner.getSize().getY() / 2000f));
 		RenderUtil.drawLibraryTextureRect(0, 0, owner.getSize().getX() / 1000d, owner.getSize().getY() / 1000d, this.textureName);
 		RenderUtil.popMatrix();
+	}
+
+	public String getTextureName()
+	{
+		return textureName;
+	}
+
+	public void setTextureName(String textureName)
+	{
+		this.textureName = textureName;
 	}
 }

@@ -53,6 +53,7 @@ public class TextureLibrary
 			g2d.setColor(new Color(255, 0, 255));
 			g2d.fillRect(0, 0, size, size);
 			List<TextureData> l = new ArrayList<TextureData>();
+			l.add(createDefaultTexture());
 			for (File f : raw.listFiles())
 			{
 				l.addAll(getTextureDataFromFile(f));
@@ -66,6 +67,16 @@ public class TextureLibrary
 		}
 		textureGL = Texture.makeTexture(textureAWT);
 		textureGL.bind();
+	}
+	
+	private TextureData createDefaultTexture()
+	{
+		BufferedImage img = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
+		Graphics2D g2d = img.createGraphics();
+		g2d.setColor(Color.WHITE);
+		g2d.drawRect(0, 0, 16, 16);
+		
+		return new TextureData(img, "default");
 	}
 
 	private static List<TextureData> getTextureDataFromFile(File f) throws IOException
@@ -223,10 +234,20 @@ public class TextureLibrary
 
 	public Vector4f getCoordinates(String textureName)
 	{
-		if (!textureCoordinates.containsKey(textureName)) Console.log(this.name + " does not contain " + textureName);
-		Vector4f v = new Vector4f(textureCoordinates.get(textureName));
+		Vector4f v = textureCoordinates.get(textureName);
+		if (v == null)
+		{
+			if(!textureName.contains("_")) return getCoordinates("default");
+			return getCoordinates(textureName.substring(0, textureName.lastIndexOf("_")));
+		}
+		v = new Vector4f(v);
 		v.scale(1f / size);
 		return v;
+	}
+
+	public boolean doesTextureExist(String texture)
+	{
+		return this.textureCoordinates.get(texture) != null;
 	}
 
 	private static class TextureData
@@ -240,6 +261,15 @@ public class TextureLibrary
 			this.awtImg = awtImg;
 			this.name = name;
 		}
+	}
+
+	public int getNumberOfTextureCycles(String texture)
+	{
+		int ret = 0;
+		for (; this.doesTextureExist(texture + "_" + (ret + 1)); ret++)
+			;
+		return ret == 0 ? 1 : ret;
+
 	}
 
 	public void bind()

@@ -3,6 +3,7 @@ package com.ichmed.bol2d.entity;
 import org.lwjgl.util.vector.Vector2f;
 
 import com.ichmed.bol2d.entity.ai.behaviour.BehaviourRemoveOnCleanup;
+import com.ichmed.bol2d.render.animation.Animation;
 
 public class EntityGenericParticle extends Entity
 {

@@ -20,10 +20,10 @@ public abstract class World
 	private Map<EntityType, List<Entity>> currentEntitiesByType = new HashMap<EntityType, List<Entity>>();
 	private Map<EntityType, List<Entity>> nextEntitiesByType = new HashMap<EntityType, List<Entity>>();
 	public EntityPlayer player;
-	private float RENDER_RANGE = 1200;
+	private float RENDER_RANGE = 2000;
 	private int renderRangeLastTick = 0;
 	private List<Entity> entitiesInRenderRange = null;
-	private float UPDATE_RANGE = 2000;
+	private float UPDATE_RANGE = 4000;
 	private int updateRangeLastTick = 0;
 	public int currentParticles = 0;
 	private List<Entity> entitiesToCleanup = new ArrayList<Entity>();
@@ -54,7 +54,7 @@ public abstract class World
 		for (int i = 0; i < 10; i++)
 			for (Entity e : getEntitesInRenderRange())
 			{
-				e.draw(i);
+				e.render(i);
 			}
 		glPopMatrix();
 		RenderUtil.resetLastEntityCentered();

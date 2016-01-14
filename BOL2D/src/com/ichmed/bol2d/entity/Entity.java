@@ -8,9 +8,10 @@ import com.ichmed.bol2d.Game;
 import com.ichmed.bol2d.entity.ai.behaviour.*;
 import com.ichmed.bol2d.entity.damage.*;
 import com.ichmed.bol2d.render.RenderContainerEntity;
+import com.ichmed.bol2d.render.animation.*;
 import com.ichmed.bol2d.util.*;
 
-public abstract class Entity
+public abstract class Entity implements IAnimated
 {
 	protected Vector2f size, position = new Vector2f(0, 0);
 	public Vector2f velocity = new Vector2f(0, 0);
@@ -33,7 +34,7 @@ public abstract class Entity
 	public double rotationSpeed = 10;
 	protected boolean rotateToMovement = true;
 
-	public boolean spawnDebrisOnDeath = true;
+	public boolean spawnDebrisOnDeath = false;
 	public boolean isInmoveable = false;
 
 	private Database stats = new Database();
@@ -47,12 +48,14 @@ public abstract class Entity
 
 	@SuppressWarnings("unchecked")
 	public List<Behaviour>[] behaviours = new ArrayList[10];
-	@SuppressWarnings("unchecked")
-	public List<RenderContainerEntity>[] renderContainers = new List[10];
+	
+	public Animation animation;
 
 	protected String debrisTexture = "debris1";
 	protected float debrisSize = 0.2f;
 	protected float debrisFactor = 0.2f;
+	
+	protected RenderContainerEntity renderContainer = new RenderContainerEntity(this, true, false, textureName, new Vector2f());
 
 	public Entity()
 	{
@@ -63,21 +66,9 @@ public abstract class Entity
 
 	public void init()
 	{
-		for (int i = 0; i < renderContainers.length; i++)
-			renderContainers[i] = getRenderContainers(i);
 		initStats();
+		animation = new AnimationSimple(this, "idle");
 		this.healthSystem = getHealthSystem(stats.getFloat("MAX_HEALTH"));
-	}
-
-	protected List<RenderContainerEntity> getRenderContainers(int layer)
-	{
-		if (layer == 4)
-		{
-			ArrayList<RenderContainerEntity> l = new ArrayList<RenderContainerEntity>();
-			l.add(new RenderContainerEntity(this, true, true, this.textureName, new Vector2f()));
-			return l;
-		}
-		return new ArrayList<RenderContainerEntity>();
 	}
 
 	protected HealthSystem getHealthSystem(Float health)
@@ -171,10 +162,33 @@ public abstract class Entity
 		stats.setFloat(stat, value);
 	}
 
-	public void draw(int i)
+	public void render(int i)
 	{
-		for (RenderContainerEntity r : this.renderContainers[i])
-			r.render();
+		if(i != this.getLayer()) return;
+		animation.update(this);
+		this.renderContainer.render();
+	}
+	
+	public int getLayer()
+	{
+		return 4;
+	}
+
+	@Override
+	public void setTexture(String s)
+	{
+		this.renderContainer.setTextureName(s);
+	}
+
+	@Override
+	public void setAnimation(Animation animation)
+	{
+		this.animation = animation;
+	}
+
+	@Override
+	public void render()
+	{
 	}
 
 	public Vector2f getCenter()
@@ -289,6 +303,13 @@ public abstract class Entity
 		// this.rotation);
 		// this.rotation %= 360;
 		// }
+		if(this instanceof IInteractable)
+		{
+			IInteractable interactable = (IInteractable)this;
+			if(MathUtil.positionsInRange(this.getCenter(), Game.getGameWorld().player.getCenter(), interactable.getRange()))
+				for(int key : interactable.getAcceptedKeys())
+					if(Game.isKeyDown(key)) interactable.interact(key);
+		}
 		if (rotateToMovement && !MathUtil.areVectorsEqual(this.lastRotDir, this.velocity, Game.getCurrentGame().getRotationUpdateInterval()))
 		{
 			this.lastRotDir = new Vector2f(this.velocity);

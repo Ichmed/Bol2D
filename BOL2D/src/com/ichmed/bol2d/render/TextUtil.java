@@ -1,6 +1,5 @@
 package com.ichmed.bol2d.render;
 
-import java.nio.channels.SelectableChannel;
 import java.util.*;
 
 import org.lwjgl.util.vector.Vector3f;
@@ -20,6 +19,7 @@ public class TextUtil
 
 	public static void drawText(String text, String font, float startX, float startY, float size, TextOrientation orient)
 	{
+		RenderUtil.setColor(RenderUtil.WHITE);
 		List<String> l = seperateStringIntoLines(text);
 		float posX = 0, posY = 0;
 		for (String s : l)
@@ -125,7 +125,7 @@ public class TextUtil
 		float f = 0;
 		for (char c : s.toCharArray())
 			f += getWidthForChar(c);
-		return f;
+		return Math.max(f, 0);
 	}
 
 	public static List<String> seperateStringIntoLines(String s)

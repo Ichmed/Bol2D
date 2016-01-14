@@ -113,6 +113,11 @@ public class Console implements IGuiElement
 		}
 	}
 
+	public static void log(Object o)
+	{
+		log(o.toString());
+	}
+	
 	public static void log(String s)
 	{
 		screen += (s + "\n");
@@ -156,6 +161,17 @@ public class Console implements IGuiElement
 
 	@Override
 	public void update()
+	{
+	}
+
+	@Override
+	public IGuiElement getParent()
+	{
+		return null;
+	}
+
+	@Override
+	public void setParent(IGuiElement parent)
 	{
 	}
 }
