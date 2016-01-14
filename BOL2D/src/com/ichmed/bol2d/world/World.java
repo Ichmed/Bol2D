@@ -164,7 +164,7 @@ public abstract class World
 		return sortListByDistance(center, list, -1);
 	}
 
-	public List<Entity> sortListByDistance(Entity center, List<Entity> list, float maxDist)
+	public List<Entity> sortListByDistance(final Entity center, List<Entity> list, float maxDist)
 	{
 		if (maxDist >= 0)
 		{
@@ -174,7 +174,7 @@ public abstract class World
 			list = l;
 		}
 
-		list.sort(new Comparator<Entity>()
+		Collections.sort(list, new Comparator<Entity>()
 		{
 			@Override
 			public int compare(Entity o1, Entity o2)

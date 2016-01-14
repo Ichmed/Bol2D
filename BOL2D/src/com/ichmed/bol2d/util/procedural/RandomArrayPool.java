@@ -24,17 +24,18 @@ public class RandomArrayPool<T> implements RandomPool<T>
 	public void add(T t, int weight)
 	{
 		amount++;
+		size += weight;
 		for(int i = 0; i < weight; i++)
 			content.add(new Container<T>(weight, t));
-		size += weight;
-		content.sort(new Comparator<Container<T>>()
+		Comparator<Container<T>> c = new Comparator<Container<T>>()
 		{
 			@Override
 			public int compare(Container<T> o1, Container<T> o2)
 			{
 				return o1.weight == o2.weight ? 0 : o1.weight > o2.weight ? -1 : 1;
 			}
-		});
+		};
+		Collections.sort(content, c);
 	}
 
 	public T get(int value)
