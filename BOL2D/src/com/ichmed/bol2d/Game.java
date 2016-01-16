@@ -15,6 +15,7 @@ import org.lwjgl.util.vector.Vector2f;
 import com.ichmed.bol2d.entity.Entity;
 import com.ichmed.bol2d.gui.*;
 import com.ichmed.bol2d.render.*;
+import com.ichmed.bol2d.render.texturelibrary.*;
 import com.ichmed.bol2d.util.Database;
 import com.ichmed.bol2d.util.input.*;
 import com.ichmed.bol2d.world.World;
@@ -348,7 +349,7 @@ public abstract class Game
 
 		try
 		{
-			TextureLibrary.createLibrary("default", "resc/texture/default/", shouldShowTextureStiching());
+			TextureLibrarySheet.createLibrary("default", "resc/texture/default/", shouldShowTextureStiching());
 		} catch (Exception e)
 		{
 			e.printStackTrace();

@@ -1,7 +1,7 @@
 package com.ichmed.bol2d.render.animation;
 
 import com.ichmed.bol2d.gui.Console;
-import com.ichmed.bol2d.render.TextureLibrary;
+import com.ichmed.bol2d.render.texturelibrary.TextureLibrary;
 
 public class Animation
 {

@@ -3,8 +3,6 @@ package com.ichmed.bol2d.render;
 import org.lwjgl.util.vector.*;
 
 import com.ichmed.bol2d.entity.Entity;
-import com.ichmed.bol2d.gui.Console;
-import com.ichmed.bol2d.render.animation.*;
 
 public class RenderContainerEntity implements IRenderContainer
 {
@@ -38,7 +36,7 @@ public class RenderContainerEntity implements IRenderContainer
 		RenderUtil.translate((Vector2f) v.scale(0.001f));
 		RenderUtil.rotateByDegrees((float) rot);
 		RenderUtil.translate(new Vector2f(-owner.getSize().getX() / 2000f, -owner.getSize().getY() / 2000f));
-		RenderUtil.drawLibraryTextureRect(0, 0, owner.getSize().getX() / 1000d, owner.getSize().getY() / 1000d, this.textureName);
+		RenderUtil.drawLibraryTextureRect(0f, 0f, owner.getSize().getX() / 1000f, owner.getSize().getY() / 1000f, this.textureName);
 		RenderUtil.popMatrix();
 	}
 

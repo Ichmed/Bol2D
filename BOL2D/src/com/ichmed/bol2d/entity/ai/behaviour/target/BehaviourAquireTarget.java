@@ -20,6 +20,7 @@ public class BehaviourAquireTarget extends BehaviourUpdate {
 
 	public BehaviourAquireTarget(Filter<Entity> filter, TargetType targetType, float range) {
 		super();
+		this.targetType = targetType;
 		this.filter = filter;
 		this.range = range;
 	}
@@ -27,11 +28,13 @@ public class BehaviourAquireTarget extends BehaviourUpdate {
 	@Override
 	public boolean perform(Entity e, Entity f) {
 		if(e == null) return false;
+
+		if(e.targets.get(targetType) != null && !e.targets.get(targetType).isDead()) return false;
 		List<Entity> l = Game.getGameWorld().sortListByDistance(e, Game.getGameWorld().getCurrentEntities(), range);
 		for(Entity t : l)
 			if(filter.doesAccept(t))
 			{
-				e.target = t;
+				e.targets.put(targetType, t);
 				return true;
 			}
 		return false;

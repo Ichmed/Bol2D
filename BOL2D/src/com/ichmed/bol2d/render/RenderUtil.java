@@ -7,6 +7,7 @@ import java.util.*;
 import org.lwjgl.util.vector.*;
 
 import com.ichmed.bol2d.entity.Entity;
+import com.ichmed.bol2d.render.texturelibrary.TextureLibrary;
 import com.ichmed.bol2d.util.MathUtil;
 
 public class RenderUtil
@@ -36,7 +37,7 @@ public class RenderUtil
 		colors.put("BLACK", BLACK);
 	}
 
-	public static void drawLibraryTextureRect(double x, double y, double width, double height, String name)
+	public static void drawLibraryTextureRect(float x, float y, float width, float height, String name)
 	{
 		String libName = "default";
 		if(name.split("\\$").length > 1)
@@ -46,24 +47,7 @@ public class RenderUtil
 		}
 		glEnable(GL_TEXTURE_2D);
 		TextureLibrary t = TextureLibrary.getTextureLibrary(libName);
-		t.bind();
-		Vector4f v = t.getCoordinates(name);
-		float x1 = 1 - v.x;
-		float y1 = 1 - v.y;
-		float x2 = 1 - (v.x + v.z);
-		float y2 = 1 - (v.y + v.w);
-		glBegin(GL_QUADS);
-		{
-			glTexCoord2f(x1, y2);
-			glVertex2d(x, y);
-			glTexCoord2f(x2, y2);
-			glVertex2d(x + width, y);
-			glTexCoord2f(x2, y1);
-			glVertex2d(x + width, y + height);
-			glTexCoord2f(x1, y1);
-			glVertex2d(x, y + height);
-		}
-		glEnd();
+		t.drawLibraryTextureRect(x, y, width, height, name);
 	}
 
 	public static void drawTexturedRect(Vector4f coords, Vector4f textureCoords)
@@ -72,13 +56,13 @@ public class RenderUtil
 		glBegin(GL_QUADS);
 		{
 			glTexCoord2f(textureCoords.x, textureCoords.y);
-			glVertex2d(coords.x, coords.y);
-			glTexCoord2f(textureCoords.z, textureCoords.y);
-			glVertex2d(coords.z, coords.y);
-			glTexCoord2f(textureCoords.z, textureCoords.w);
-			glVertex2d(coords.z, coords.w);
-			glTexCoord2f(textureCoords.x, textureCoords.w);
 			glVertex2d(coords.x, coords.w);
+			glTexCoord2f(textureCoords.z, textureCoords.y);
+			glVertex2d(coords.z, coords.w);
+			glTexCoord2f(textureCoords.z, textureCoords.w);
+			glVertex2d(coords.z, coords.y);
+			glTexCoord2f(textureCoords.x, textureCoords.w);
+			glVertex2d(coords.x, coords.y);
 		}
 		glEnd();
 	}

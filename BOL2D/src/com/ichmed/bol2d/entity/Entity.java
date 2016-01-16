@@ -6,7 +6,9 @@ import org.lwjgl.util.vector.*;
 
 import com.ichmed.bol2d.Game;
 import com.ichmed.bol2d.entity.ai.behaviour.*;
+import com.ichmed.bol2d.entity.ai.behaviour.target.TargetType;
 import com.ichmed.bol2d.entity.damage.*;
+import com.ichmed.bol2d.gui.Console;
 import com.ichmed.bol2d.render.RenderContainerEntity;
 import com.ichmed.bol2d.render.animation.*;
 import com.ichmed.bol2d.util.*;
@@ -39,7 +41,7 @@ public abstract class Entity implements IAnimated
 
 	private Database stats = new Database();
 
-	public Entity target = null;
+	public Map<TargetType, Entity> targets = new HashMap<TargetType, Entity>(); 
 	private int ticksExisted;
 
 	private boolean isDead = false;
@@ -76,12 +78,33 @@ public abstract class Entity implements IAnimated
 		return new HealthSystemDefault(health);
 	}
 
+	public boolean accelerate(Vector2f v, float scale)
+	{
+		Vector2f v2 = new Vector2f(v);
+		v2.normalise();
+		v2.scale(scale);
+		return accelerate(v2);		
+	}
+	
 	public boolean accelerate(Vector2f v)
 	{
 		if (this.isInmoveable) return false;
 		this.velocity.x += v.x;
 		this.velocity.y += v.y;
 		return true;
+	}
+	
+	public void setVelocity(Vector2f v)
+	{
+		this.velocity = new Vector2f(v);
+	}
+
+	public void setVelocity(Vector2f v, float scale)
+	{
+		Vector2f v2 = new Vector2f(v);
+		v2.normalise();
+		v2.scale(scale);
+		setVelocity(v2);	
 	}
 
 	public void addBehaviour(Behaviour behaviour)
@@ -320,7 +343,7 @@ public abstract class Entity implements IAnimated
 		for (int i = 0; i < behaviours.length; i++)
 			for (Behaviour b : this.behaviours[i])
 			{
-				if (b.type == BehaviourType.ON_UPDATE) b.perform(this, this.target);
+				if (b.type == BehaviourType.ON_UPDATE) b.perform(this, null);
 				if (b.type == BehaviourType.ON_IMPACT && l.size() > 0) b.perform(this, l.get(0));
 			}
 	}

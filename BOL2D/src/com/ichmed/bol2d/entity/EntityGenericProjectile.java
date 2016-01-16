@@ -21,7 +21,7 @@ public class EntityGenericProjectile extends Entity
 	@Override
 	public Vector2f getInitialSize()
 	{
-		return new Vector2f(40, 40);
+		return new Vector2f(80, 80);
 	}
 	
 	protected List<RenderContainerEntity> getRenderContainers(int layer)
