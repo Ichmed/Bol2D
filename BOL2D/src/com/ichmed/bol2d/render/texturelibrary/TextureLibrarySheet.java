@@ -13,11 +13,12 @@ import org.lwjgl.util.vector.Vector4f;
 import com.ichmed.bol2d.Game;
 import com.ichmed.bol2d.gui.Console;
 import com.ichmed.bol2d.render.*;
+import com.ichmed.bol2d.render.texture.TextureSimple;
 
 public class TextureLibrarySheet extends TextureLibrary
 {
 	private HashMap<String, Vector4f> textureCoordinates;
-	private Texture textureGL;
+	private TextureSimple textureGL;
 	private BufferedImage textureAWT;
 	private int size;
 
@@ -64,7 +65,7 @@ public class TextureLibrarySheet extends TextureLibrary
 		g2d.fillRect(0, 0, size, size);
 		if (placeTexturesRecursiv(g2d, data) || placeTexturesRecursivSkipFirst(g2d, data))
 		;
-		textureGL = Texture.makeTexture(textureAWT);	
+		textureGL = TextureSimple.makeTexture(textureAWT);	
 	}
 	
 	public void cleanUp()

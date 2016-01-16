@@ -1,4 +1,4 @@
-package com.ichmed.bol2d.render;
+package com.ichmed.bol2d.render.texture;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -11,14 +11,14 @@ import javax.imageio.ImageIO;
 
 import org.lwjgl.BufferUtils;
 
-public class Texture
+public class TextureSimple implements Texture
 {
-	public static Texture makeTexture(String path, String format) throws Exception
+	public static TextureSimple makeTexture(String path, String format) throws Exception
 	{
 		return makeTexture(ImageIO.read(new File(path)));
 	}
 
-	public static Texture makeTexture(BufferedImage bfrdImg)
+	public static TextureSimple makeTexture(BufferedImage bfrdImg)
 	{
 		byte[] imgData = new byte[bfrdImg.getWidth() * bfrdImg.getHeight() * 4];
 		for (int i = 0; i < imgData.length; i += 4)
@@ -29,12 +29,12 @@ public class Texture
 			imgData[i + 2] = (byte) (color.getBlue());
 			imgData[i + 3] = (byte) (color.getAlpha());
 		}
-		Texture t = new Texture(imgData, bfrdImg.getWidth(), bfrdImg.getHeight());
+		TextureSimple t = new TextureSimple(imgData, bfrdImg.getWidth(), bfrdImg.getHeight());
 		System.out.println("Created Texture " + t.ID);
 		return t;
 	}
 
-	public Texture(byte[] data, int width, int height)
+	public TextureSimple(byte[] data, int width, int height)
 	{
 		this.ID = glGenTextures();
 		try
