@@ -377,4 +377,9 @@ public abstract class Game
 	{
 		getCurrentGame().gui[i].add(e);
 	}
+
+	public static long getSeed()
+	{
+		return 1337;
+	}
 }

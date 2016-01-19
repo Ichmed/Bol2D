@@ -7,23 +7,31 @@ import java.util.*;
 import org.lwjgl.util.vector.*;
 
 import com.ichmed.bol2d.entity.Entity;
+import com.ichmed.bol2d.gui.Console;
 import com.ichmed.bol2d.render.texturelibrary.TextureLibrary;
 import com.ichmed.bol2d.util.MathUtil;
 
 public class RenderUtil
 {
 	private static Map<String, Vector3f> colors = new HashMap<String, Vector3f>();
-	
+
 	public static final Vector3f RED = new Vector3f(1, 0, 0);
 	public static final Vector3f GREEN = new Vector3f(0, 1, 0);
 	public static final Vector3f BLUE = new Vector3f(0, 0, 1);
 	public static final Vector3f YELLOW = new Vector3f(1, 1, 0);
 	public static final Vector3f CYAN = new Vector3f(0, 1, 1);
 	public static final Vector3f MAGENTA = new Vector3f(1, 0, 1);
-	
+
 	public static final Vector3f WHITE = new Vector3f(1, 1, 1);
 	public static final Vector3f BLACK = new Vector3f(0, 0, 0);
 	
+	private static Vector3f defaultColor = WHITE;
+
+	public static void setDefaultColor(Vector3f defaultColor)
+	{
+		RenderUtil.defaultColor = defaultColor;
+	}
+
 	static
 	{
 		colors.put("RED", RED);
@@ -32,7 +40,7 @@ public class RenderUtil
 		colors.put("YELLOW", YELLOW);
 		colors.put("CYAN", CYAN);
 		colors.put("MAGENTA", MAGENTA);
-		
+
 		colors.put("WHITE", WHITE);
 		colors.put("BLACK", BLACK);
 	}
@@ -40,7 +48,7 @@ public class RenderUtil
 	public static void drawLibraryTextureRect(float x, float y, float width, float height, String name)
 	{
 		String libName = "default";
-		if(name.split("\\$").length > 1)
+		if (name.split("\\$").length > 1)
 		{
 			libName = name.split("\\$")[0];
 			name = name.split("\\$")[1];
@@ -97,10 +105,21 @@ public class RenderUtil
 	{
 		lastEntityCentered = null;
 	}
-	
+
 	public static void setColor(String color)
 	{
-		setColor(colors.get(color));
+		Vector3f c = colors.get(color);
+		if(color.equals("DEFAULT")) c = defaultColor;
+		if (c == null)
+		{
+			Console.log("The color " + color + " does not exist, a Random color has been chosen, please define it yourself");
+			float r = (float) Math.random();
+			float g = (float) Math.random();
+			float b = (float) Math.random();
+			c = new Vector3f(r, g, b);
+			colors.put(color, c);
+		}
+		setColor(c);
 	}
 
 	public static void setColor(Vector3f color)
@@ -110,7 +129,8 @@ public class RenderUtil
 
 	public static void setColor(Vector3f color, float alpha)
 	{
-		glColor4f(color.x, color.y, color.z, alpha);
+		if (color == null) glColor4f(1, 1, 1, 1);
+		else glColor4f(color.x, color.y, color.z, alpha);
 	}
 
 	public static void pushMatrix()

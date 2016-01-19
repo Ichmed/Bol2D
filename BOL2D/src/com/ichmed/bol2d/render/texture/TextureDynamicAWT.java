@@ -23,6 +23,7 @@ public class TextureDynamicAWT implements Texture
 	
 	public void bind()
 	{
+		if(t != null) t.destroy();
 		t = TextureSimple.makeTexture(awtImage);
 		t.bind();
 	}

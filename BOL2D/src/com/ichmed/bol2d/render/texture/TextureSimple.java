@@ -11,7 +11,7 @@ import javax.imageio.ImageIO;
 
 import org.lwjgl.BufferUtils;
 
-public class TextureSimple implements Texture
+public class TextureSimple
 {
 	public static TextureSimple makeTexture(String path, String format) throws Exception
 	{
@@ -30,7 +30,6 @@ public class TextureSimple implements Texture
 			imgData[i + 3] = (byte) (color.getAlpha());
 		}
 		TextureSimple t = new TextureSimple(imgData, bfrdImg.getWidth(), bfrdImg.getHeight());
-		System.out.println("Created Texture " + t.ID);
 		return t;
 	}
 
@@ -64,6 +63,11 @@ public class TextureSimple implements Texture
 		{
 			e.printStackTrace();
 		}
+	}
+	
+	public void destroy()
+	{
+		glDeleteTextures(ID);
 	}
 
 	private final int ID;
